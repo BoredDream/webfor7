@@ -1,0 +1,54 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import { ageGroups, classesByGroup } from '../../data/classes';
+import { getMember } from '../../data/team';
+---
+
+<BaseLayout title="班级">
+  <PageHeader
+    emoji="🏫"
+    title="班级"
+    subtitle="我们按年龄把孩子分成不同班级,每个班级都有专属的带班老师、课表与学生。点击班级了解详情。"
+  />
+
+  <div class="mx-auto max-w-6xl px-4 py-12 space-y-12">
+    {ageGroups.map((group) => {
+      const list = classesByGroup(group.id);
+      return (
+        <section>
+          <div class="flex items-center gap-3 mb-5">
+            <span class="text-3xl">{group.emoji}</span>
+            <div>
+              <h2 class="text-xl font-bold text-gray-900">{group.label}</h2>
+              <p class="text-sm text-gray-500">{group.desc}</p>
+            </div>
+          </div>
+
+          {list.length === 0 ? (
+            <p class="text-sm text-gray-400">该年龄段暂未设置班级。</p>
+          ) : (
+            <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {list.map((cls) => {
+                const head = getMember(cls.headTeacherId);
+                return (
+                  <a href={`/classes/${cls.id}`} class="group bg-white rounded-3xl p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all border border-grass-100">
+                    <h3 class="text-xl font-bold text-gray-900 group-hover:text-grass-700 transition-colors">{cls.name}</h3>
+                    <div class="flex items-center gap-2 mt-3 text-sm text-gray-600">
+                      <span class="text-2xl">{head?.avatar ?? '👤'}</span>
+                      <span>带班老师 · {head?.name ?? '待定'}</span>
+                    </div>
+                    <div class="flex gap-4 mt-4 text-sm text-gray-500">
+                      <span>👧 {cls.students.length} 名学生</span>
+                      <span>📅 {cls.timetable.length} 节课</span>
+                    </div>
+                  </a>
+                );
+              })}
+            </div>
+          )}
+        </section>
+      );
+    })}
+  </div>
+</BaseLayout>

@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import CourseCard from '../../components/CourseCard.astro';
+import { courses } from '../../data/courses';
+
+const categories = ['科学', '人文', '艺术', '素养'] as const;
+---
+
+<BaseLayout title="课程安排">
+  <PageHeader
+    emoji="📚"
+    title="特色课程"
+    subtitle="我们为乡村孩子量身设计的课程体系 —— 不只是上课,更是打开一扇看世界的窗。点击任意课程查看详情、课件与科普视频。"
+  />
+
+  <div class="mx-auto max-w-6xl px-4 py-12 space-y-12">
+    {categories.map((cat) => {
+      const list = courses.filter((c) => c.category === cat);
+      if (list.length === 0) return null;
+      return (
+        <section>
+          <h2 class="text-xl font-bold text-gray-900 mb-5 flex items-center gap-2">
+            <span class="w-1.5 h-6 bg-grass-500 rounded-full"></span>{cat}类
+          </h2>
+          <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {list.map((course) => <CourseCard course={course} />)}
+          </div>
+        </section>
+      );
+    })}
+  </div>
+</BaseLayout>

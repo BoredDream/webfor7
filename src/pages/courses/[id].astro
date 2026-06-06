@@ -1,0 +1,76 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { courses, getCourse } from '../../data/courses';
+import { getMember } from '../../data/team';
+
+export async function getStaticPaths() {
+  return courses.map((course) => ({ params: { id: course.id }, props: { course } }));
+}
+
+const { course } = Astro.props;
+const teacher = getMember(course.teacherId);
+---
+
+<BaseLayout title={course.title} description={course.goal}>
+  <div class="mx-auto max-w-3xl px-4 py-12">
+    <a href="/courses" class="text-sm text-grass-600 hover:underline">← 返回课程安排</a>
+
+    <header class="mt-6 mb-8 flex items-start gap-4">
+      <span class="text-6xl">{course.emoji}</span>
+      <div>
+        <span class="text-xs font-medium bg-grass-100 text-grass-700 px-2.5 py-1 rounded-full">{course.category}类</span>
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mt-2">{course.title}</h1>
+        <p class="text-grass-600 font-medium mt-1">面向 {course.audience}</p>
+      </div>
+    </header>
+
+    <!-- 课程介绍 -->
+    <section class="bg-white rounded-3xl p-6 shadow-sm border border-grass-100 mb-6">
+      <h2 class="text-lg font-bold text-gray-900 mb-3">课程介绍</h2>
+      <div class="space-y-3 text-gray-700 leading-relaxed">
+        {course.intro.map((p) => <p>{p}</p>)}
+      </div>
+      <div class="mt-5 flex flex-wrap gap-2">
+        {course.highlights.map((h) => (
+          <span class="text-xs bg-grass-50 text-grass-700 px-2.5 py-1 rounded-full">{h}</span>
+        ))}
+      </div>
+    </section>
+
+    <div class="grid sm:grid-cols-2 gap-6">
+      <!-- 任课老师 -->
+      {teacher && (
+        <a href={`/team/${teacher.id}`} class="group bg-white rounded-3xl p-6 shadow-sm border border-grass-100 hover:shadow-lg transition-all">
+          <h2 class="text-sm font-semibold text-gray-400 mb-3">任课老师</h2>
+          <div class="flex items-center gap-3">
+            <span class="text-4xl">{teacher.avatar}</span>
+            <div>
+              <div class="font-bold text-gray-900 group-hover:text-grass-700 transition-colors">{teacher.name}</div>
+              <div class="text-sm text-grass-600">{teacher.role}</div>
+            </div>
+          </div>
+          <span class="text-sm text-grass-600 mt-3 inline-block">查看老师介绍 →</span>
+        </a>
+      )}
+
+      <!-- 资源 -->
+      <div class="bg-white rounded-3xl p-6 shadow-sm border border-grass-100">
+        <h2 class="text-sm font-semibold text-gray-400 mb-3">课程资源</h2>
+        <div class="space-y-3">
+          {course.coursewareUrl ? (
+            <a href={course.coursewareUrl} download class="flex items-center gap-2 text-grass-700 font-medium hover:underline">
+              📥 下载课件
+            </a>
+          ) : (
+            <p class="text-sm text-gray-400">课件整理中…</p>
+          )}
+          {course.videoUrl && (
+            <a href={course.videoUrl} target="_blank" rel="noopener" class="flex items-center gap-2 text-sky-deep font-medium hover:underline">
+              ▶️ 观看趣味科普视频
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

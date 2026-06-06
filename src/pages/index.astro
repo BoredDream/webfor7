@@ -1,0 +1,109 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import { site, stats } from '../data/site';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+const allTags = [...new Set(posts.flatMap((p) => p.data.tags))];
+---
+
+<BaseLayout title="报道">
+  <!-- 开场 Hero -->
+  <section class="relative overflow-hidden bg-gradient-to-br from-grass-500 via-grass-600 to-sky-deep text-white">
+    <div class="absolute inset-0 opacity-20" aria-hidden="true">
+      <div class="absolute -top-10 -left-10 w-72 h-72 bg-sun-300 rounded-full blur-3xl"></div>
+      <div class="absolute bottom-0 right-0 w-80 h-80 bg-sky-soft rounded-full blur-3xl"></div>
+    </div>
+    <div class="relative mx-auto max-w-6xl px-4 py-20 md:py-28 text-center float-in">
+      <p class="inline-block bg-white/20 backdrop-blur px-4 py-1 rounded-full text-sm mb-5">
+        🔥 {site.org}
+      </p>
+      <h1 class="text-4xl md:text-6xl font-bold tracking-tight">{site.slogan}</h1>
+      <p class="mt-5 text-lg md:text-xl text-grass-50/90 max-w-2xl mx-auto leading-relaxed">
+        {site.description}
+      </p>
+      <div class="mt-8 flex flex-wrap justify-center gap-3">
+        <a href="/courses" class="bg-white text-grass-700 font-semibold px-6 py-3 rounded-full hover:bg-grass-50 transition-colors shadow-lg">
+          看看我们的特色课程
+        </a>
+        <a href="/classes" class="bg-white/15 backdrop-blur border border-white/40 font-semibold px-6 py-3 rounded-full hover:bg-white/25 transition-colors">
+          走进班级
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 关键数据 -->
+  <section class="mx-auto max-w-6xl px-4 -mt-10 relative z-10">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {stats.map((s) => (
+        <div class="bg-white rounded-2xl p-5 text-center shadow-md border border-grass-100">
+          <div class="text-3xl md:text-4xl font-bold text-grass-600">{s.value}</div>
+          <div class="text-xs md:text-sm text-gray-500 mt-1">{s.suffix}</div>
+          <div class="text-sm font-medium text-gray-700 mt-1">{s.label}</div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- 报道 / 文章 -->
+  <section class="mx-auto max-w-6xl px-4 py-16">
+    <div class="flex items-end justify-between mb-8 flex-wrap gap-4">
+      <div>
+        <h2 class="text-2xl md:text-3xl font-bold text-gray-900">报道 · 动态</h2>
+        <p class="text-gray-500 mt-2">支教路上的故事、教学日记与项目公告。</p>
+      </div>
+    </div>
+
+    {allTags.length > 0 && (
+      <div class="flex flex-wrap gap-2 mb-8" id="tagFilter">
+        <button data-tag="all" class="tag-btn active px-4 py-1.5 rounded-full text-sm font-medium border border-grass-200 bg-grass-600 text-white">全部</button>
+        {allTags.map((t) => (
+          <button data-tag={t} class="tag-btn px-4 py-1.5 rounded-full text-sm font-medium border border-grass-200 text-grass-700 bg-white hover:bg-grass-50">#{t}</button>
+        ))}
+      </div>
+    )}
+
+    {posts.length === 0 ? (
+      <p class="text-gray-500 text-center py-12">还没有文章。在 <code>src/content/blog/</code> 里新增 .md 文件即可。</p>
+    ) : (
+      <div id="articleGrid" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {posts.map((post) => (
+          <div class="article-item" data-tags={post.data.tags.join(',')}>
+            <ArticleCard post={post} />
+          </div>
+        ))}
+      </div>
+    )}
+  </section>
+</BaseLayout>
+
+<script>
+  const setupFilter = () => {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('.tag-btn');
+    const items = document.querySelectorAll<HTMLElement>('.article-item');
+    const setActive = (btn: Element) => {
+      buttons.forEach((b) => {
+        b.classList.remove('active', 'bg-grass-600', 'text-white');
+        b.classList.add('bg-white', 'text-grass-700');
+      });
+      btn.classList.add('active', 'bg-grass-600', 'text-white');
+      btn.classList.remove('bg-white', 'text-grass-700');
+    };
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const tag = btn.dataset.tag;
+        setActive(btn);
+        items.forEach((item) => {
+          const tags = (item.dataset.tags || '').split(',');
+          item.style.display = tag === 'all' || tags.includes(tag!) ? '' : 'none';
+        });
+      });
+    });
+  };
+  setupFilter();
+  document.addEventListener('astro:after-swap', setupFilter);
+</script>

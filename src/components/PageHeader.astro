@@ -1,0 +1,16 @@
+---
+interface Props {
+  title: string;
+  subtitle?: string;
+  emoji?: string;
+}
+const { title, subtitle, emoji } = Astro.props;
+---
+
+<section class="bg-gradient-to-b from-grass-50 to-cream border-b border-grass-100">
+  <div class="mx-auto max-w-6xl px-4 py-12 md:py-16 text-center float-in">
+    {emoji && <div class="text-5xl mb-3">{emoji}</div>}
+    <h1 class="text-3xl md:text-4xl font-bold text-gray-900">{title}</h1>
+    {subtitle && <p class="mt-3 text-gray-600 max-w-2xl mx-auto leading-relaxed">{subtitle}</p>}
+  </div>
+</section>

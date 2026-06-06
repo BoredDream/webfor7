@@ -1,0 +1,37 @@
+---
+import type { Course } from '../data/courses';
+interface Props { course: Course }
+const { course } = Astro.props;
+
+const catColor: Record<Course['category'], string> = {
+  科学: 'bg-sky-100 text-sky-700',
+  人文: 'bg-amber-100 text-amber-700',
+  艺术: 'bg-pink-100 text-pink-700',
+  素养: 'bg-grass-100 text-grass-700',
+};
+---
+
+<a
+  href={`/courses/${course.id}`}
+  class="group block bg-white rounded-3xl p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all border border-grass-100"
+>
+  <div class="flex items-start justify-between mb-4">
+    <span class="text-4xl group-hover:scale-110 transition-transform">{course.emoji}</span>
+    <span class={`text-xs font-medium px-2.5 py-1 rounded-full ${catColor[course.category]}`}>
+      {course.category}
+    </span>
+  </div>
+  <h3 class="text-xl font-bold text-gray-900 mb-1 group-hover:text-grass-700 transition-colors">
+    {course.title}
+  </h3>
+  <p class="text-sm text-grass-600 font-medium mb-3">面向 {course.audience}</p>
+  <p class="text-gray-600 text-sm leading-relaxed mb-4">{course.goal}</p>
+  <ul class="flex flex-wrap gap-2">
+    {course.highlights.map((h) => (
+      <li class="text-xs bg-grass-50 text-grass-700 px-2.5 py-1 rounded-full">{h}</li>
+    ))}
+  </ul>
+  <span class="inline-flex items-center gap-1 text-sm text-grass-600 font-medium mt-4 group-hover:gap-2 transition-all">
+    查看课程详情 →
+  </span>
+</a>
