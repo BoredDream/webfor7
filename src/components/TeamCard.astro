@@ -1,22 +1,67 @@
 ---
 import type { Member } from '../data/team';
-interface Props { member: Member; href?: string }
-const { member, href = `/team/${member.id}` } = Astro.props;
+
+interface Props {
+  member: Member;
+  href?: string;
+  /** featured:队长大卡(bento 占双列双行);normal:标准卡 */
+  size?: 'featured' | 'normal';
+  class?: string;
+}
+const { member, href = `/team/${member.id}`, size = 'normal', class: cls = '' } = Astro.props;
 const isImage = member.avatar.startsWith('/') || member.avatar.startsWith('http');
+
+// 头像底盘按 id 循环蜡笔色,形成彩色头像墙
+const tints = ['bg-csky-100', 'bg-camber-100', 'bg-cpink-100', 'bg-cgrass-100', 'bg-sun-100'];
+const tint = tints[member.id.charCodeAt(0) % tints.length];
+
+// featured 卡引用 intro 里带引号的那句话(通常是最后一段)
+const quote = member.intro.find((p) => p.includes('"') || p.includes('“')) ?? member.intro[member.intro.length - 1];
 ---
 
-<a
-  href={href}
-  class="group block bg-white rounded-3xl p-6 text-center shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all border border-grass-100"
->
-  <div class="mx-auto mb-4 w-20 h-20 rounded-full bg-gradient-to-br from-grass-100 to-sky-100 flex items-center justify-center overflow-hidden">
-    {isImage ? (
-      <img src={member.avatar} alt={member.name} class="w-full h-full object-cover" />
-    ) : (
-      <span class="text-4xl group-hover:scale-110 transition-transform">{member.avatar}</span>
+{size === 'featured' ? (
+  <a href={href} class={`sticker-card group flex flex-col justify-between p-8 h-full ${cls}`}>
+    <span class="tape" aria-hidden="true"></span>
+    <div class="flex items-center gap-5">
+      <div class={`sticker-chip w-24 h-24 rounded-full ${tint} grid place-items-center overflow-hidden -rotate-3 shrink-0`}>
+        {isImage ? (
+          <img src={member.avatar} alt={member.name} class="w-full h-full object-cover" />
+        ) : (
+          <span class="text-5xl transition-transform duration-300 group-hover:scale-110">{member.avatar}</span>
+        )}
+      </div>
+      <div>
+        <h3 class="font-display text-3xl text-ink">{member.name}</h3>
+        <p class="text-sm font-bold text-ink/50 mt-1">{member.role}</p>
+        {member.subjects && (
+          <div class="flex flex-wrap gap-1.5 mt-2.5">
+            {member.subjects.map((s) => (
+              <span class="rounded-full bg-sun-200/70 px-2.5 py-0.5 text-xs font-bold text-ink">{s}</span>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+    {quote && (
+      <blockquote class="mt-6 border-l-4 border-sun-400 bg-sun-100/60 rounded-r-xl px-4 py-3 font-display text-lg text-ink/75 leading-relaxed">
+        {quote}
+      </blockquote>
     )}
-  </div>
-  <h3 class="font-bold text-gray-900 group-hover:text-grass-700 transition-colors">{member.name}</h3>
-  <p class="text-sm text-grass-600 font-medium mt-0.5">{member.role}</p>
-  {member.bio && <p class="text-sm text-gray-500 mt-2 leading-relaxed">{member.bio}</p>}
-</a>
+    <span class="mt-6 inline-flex items-center gap-1 text-sm font-bold text-ink/55 group-hover:gap-2 transition-all">
+      认识 TA →
+    </span>
+  </a>
+) : (
+  <a href={href} class={`sticker-card group block p-6 text-center h-full ${cls}`}>
+    <div class={`sticker-chip mx-auto mb-4 w-20 h-20 rounded-full ${tint} grid place-items-center overflow-hidden -rotate-2`}>
+      {isImage ? (
+        <img src={member.avatar} alt={member.name} class="w-full h-full object-cover" />
+      ) : (
+        <span class="text-4xl transition-transform duration-300 group-hover:scale-110">{member.avatar}</span>
+      )}
+    </div>
+    <h3 class="font-display text-xl text-ink">{member.name}</h3>
+    <p class="text-sm font-bold text-ink/50 mt-0.5">{member.role}</p>
+    {member.bio && <p class="text-sm font-medium text-ink/60 mt-2 leading-relaxed">{member.bio}</p>}
+  </a>
+)}

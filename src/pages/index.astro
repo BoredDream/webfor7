@@ -1,6 +1,11 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ArticleCard from '../components/ArticleCard.astro';
+import FeaturedArticleCard from '../components/FeaturedArticleCard.astro';
+import SectionTitle from '../components/SectionTitle.astro';
+import Counter from '../components/Counter.astro';
+import Doodle from '../components/decor/Doodle.astro';
+import Hills from '../components/decor/Hills.astro';
 import { site, stats } from '../data/site';
 import { getCollection } from 'astro:content';
 
@@ -8,72 +13,107 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
 );
 const allTags = [...new Set(posts.flatMap((p) => p.data.tags))];
+const [latest, ...restPosts] = posts;
+
+// 口号按逗号断行,第一段加高亮笔触
+const sloganParts = site.slogan.split(/[,,]/).filter(Boolean);
+
+// 数据区:受益学生作为主卡,其余为小贴纸卡
+const mainStat = stats.find((s) => s.label === '受益学生') ?? stats[0];
+const sideStats = stats.filter((s) => s !== mainStat);
 ---
 
 <BaseLayout title="报道">
-  <!-- 开场 Hero -->
-  <section class="relative overflow-hidden bg-gradient-to-br from-grass-500 via-grass-600 to-sky-deep text-white">
-    <div class="absolute inset-0 opacity-20" aria-hidden="true">
-      <div class="absolute -top-10 -left-10 w-72 h-72 bg-sun-300 rounded-full blur-3xl"></div>
-      <div class="absolute bottom-0 right-0 w-80 h-80 bg-sky-soft rounded-full blur-3xl"></div>
-    </div>
-    <div class="relative mx-auto max-w-6xl px-4 py-20 md:py-28 text-center float-in">
-      <p class="inline-block bg-white/20 backdrop-blur px-4 py-1 rounded-full text-sm mb-5">
-        🔥 {site.org}
-      </p>
-      <h1 class="text-4xl md:text-6xl font-bold tracking-tight">{site.slogan}</h1>
-      <p class="mt-5 text-lg md:text-xl text-grass-50/90 max-w-2xl mx-auto leading-relaxed">
+  <!-- 开场 Hero:纸面 + 手绘太阳/云朵 + 山丘 -->
+  <section class="relative overflow-hidden">
+    <Doodle variant="sun" class="absolute right-[6%] top-12 w-28 md:w-40" />
+    <Doodle variant="cloud" class="absolute left-[4%] top-24 w-24 opacity-80" />
+    <Doodle variant="cloud" class="absolute right-[28%] top-8 w-14 opacity-50 hidden md:block" />
+    <div class="relative mx-auto max-w-6xl px-4 pt-20 pb-16 md:pt-24 md:pb-24">
+      <span class="sticker-chip inline-block rounded-full bg-card px-4 py-1.5 text-sm font-bold text-ink -rotate-2 float-in">
+        🚌 {site.org} · {site.year}
+      </span>
+      <h1 class="mt-7 max-w-2xl font-display text-4xl md:text-6xl leading-[1.25] text-ink float-in" style="animation-delay:.08s">
+        {sloganParts.map((part, i) => (
+          <>
+            {i === 0 ? <span class="hl-sun">{part}</span> : part}
+            {i < sloganParts.length - 1 && <>,<br /></>}
+          </>
+        ))}
+      </h1>
+      <p class="mt-6 max-w-xl text-lg text-ink/70 leading-relaxed font-medium float-in" style="animation-delay:.16s">
         {site.description}
       </p>
-      <div class="mt-8 flex flex-wrap justify-center gap-3">
-        <a href="/courses" class="bg-white text-grass-700 font-semibold px-6 py-3 rounded-full hover:bg-grass-50 transition-colors shadow-lg">
-          看看我们的特色课程
-        </a>
-        <a href="/classes" class="bg-white/15 backdrop-blur border border-white/40 font-semibold px-6 py-3 rounded-full hover:bg-white/25 transition-colors">
-          走进班级
-        </a>
+      <div class="mt-9 flex flex-wrap items-center gap-5 float-in" style="animation-delay:.24s">
+        <a href="/courses" class="sticker-btn bg-sun-400">看看我们的课程</a>
+        <a href="/classes" class="sticker-btn bg-card">走进班级</a>
+        <Doodle variant="arrow" class="w-16 text-ink/50 hidden md:block" />
       </div>
     </div>
+    <Hills />
   </section>
 
-  <!-- 关键数据 -->
+  <!-- 关键数据:贴纸 bento -->
   <section class="mx-auto max-w-6xl px-4 -mt-10 relative z-10">
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-      {stats.map((s) => (
-        <div class="bg-white rounded-2xl p-5 text-center shadow-md border border-grass-100">
-          <div class="text-3xl md:text-4xl font-bold text-grass-600">{s.value}</div>
-          <div class="text-xs md:text-sm text-gray-500 mt-1">{s.suffix}</div>
-          <div class="text-sm font-medium text-gray-700 mt-1">{s.label}</div>
+    <div class="grid gap-5 grid-cols-2 md:grid-cols-4">
+      <div class="sticker-card col-span-2 md:row-span-2 p-7 -rotate-1 flex flex-col justify-between">
+        <span class="tape" aria-hidden="true"></span>
+        <div>
+          <p class="inline-block rounded-full bg-sun-200/70 px-3 py-0.5 text-xs font-bold text-ink">{mainStat.label}</p>
+          <p class="mt-3 font-display text-6xl md:text-7xl text-ink">
+            <Counter value={mainStat.value} />
+            <span class="text-2xl text-ink/55 ml-1">{mainStat.suffix}</span>
+          </p>
+        </div>
+        <p class="mt-5 text-ink/60 font-medium leading-relaxed">每一个数字背后,都是一段真实发生的相遇。</p>
+      </div>
+      {sideStats.map((s, i) => (
+        <div class={`sticker-card p-5 text-center ${['rotate-1', '-rotate-1', 'rotate-[1.5deg]'][i % 3]}`}>
+          <p class="font-display text-4xl text-ink"><Counter value={s.value} /></p>
+          <p class="mt-1 text-sm font-bold text-ink/55">{s.suffix}</p>
+          <p class="mt-2 inline-block rounded-full bg-sun-200/70 px-3 py-0.5 text-xs font-bold text-ink">{s.label}</p>
         </div>
       ))}
+      <a href="/team" class="sticker-card group p-5 bg-sun-400 -rotate-[1.5deg] flex flex-col items-center justify-center text-center">
+        <Doodle variant="sparkle" class="w-8 mb-2" />
+        <p class="font-display text-lg text-ink leading-snug">认识把光带过去的人</p>
+        <span class="mt-1 text-sm font-bold text-ink/70 group-hover:translate-x-1 transition-transform">去看看 →</span>
+      </a>
     </div>
   </section>
 
   <!-- 报道 / 文章 -->
-  <section class="mx-auto max-w-6xl px-4 py-16">
+  <section class="mx-auto max-w-6xl px-4 py-16 md:py-20">
     <div class="flex items-end justify-between mb-8 flex-wrap gap-4">
-      <div>
-        <h2 class="text-2xl md:text-3xl font-bold text-gray-900">报道 · 动态</h2>
-        <p class="text-gray-500 mt-2">支教路上的故事、教学日记与项目公告。</p>
-      </div>
+      <SectionTitle title="营地报道" emoji="📌" desc="支教路上的故事、教学日记与项目公告。" />
     </div>
 
     {allTags.length > 0 && (
-      <div class="flex flex-wrap gap-2 mb-8" id="tagFilter">
-        <button data-tag="all" class="tag-btn active px-4 py-1.5 rounded-full text-sm font-medium border border-grass-200 bg-grass-600 text-white">全部</button>
+      <div class="flex flex-wrap gap-2.5 mb-9" id="tagFilter">
+        <button data-tag="all" class="tag-btn active sticker-pill bg-sun-400 text-ink text-sm font-bold cursor-pointer">全部</button>
         {allTags.map((t) => (
-          <button data-tag={t} class="tag-btn px-4 py-1.5 rounded-full text-sm font-medium border border-grass-200 text-grass-700 bg-white hover:bg-grass-50">#{t}</button>
+          <button data-tag={t} class="tag-btn sticker-pill bg-card text-ink/70 text-sm font-bold cursor-pointer hover:bg-sun-100">#{t}</button>
         ))}
       </div>
     )}
 
     {posts.length === 0 ? (
-      <p class="text-gray-500 text-center py-12">还没有文章。在 <code>src/content/blog/</code> 里新增 .md 文件即可。</p>
+      <p class="text-ink/50 text-center py-12">还没有文章。在 <code>src/content/blog/</code> 里新增 .md 文件即可。</p>
     ) : (
-      <div id="articleGrid" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {posts.map((post) => (
+      <div id="articleGrid" class="grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
+        {latest && (
+          <>
+            <div class="article-item feat-full sm:col-span-2" data-tags={latest.data.tags.join(',')}>
+              <FeaturedArticleCard post={latest} />
+            </div>
+            <div class="article-item feat-compact" data-tags={latest.data.tags.join(',')} style="display:none">
+              <ArticleCard post={latest} class="rotate-[0.6deg] h-full" />
+            </div>
+          </>
+        )}
+        {restPosts.map((post, i) => (
           <div class="article-item" data-tags={post.data.tags.join(',')}>
-            <ArticleCard post={post} />
+            <ArticleCard post={post} class={`h-full ${['rotate-[0.8deg]', '-rotate-[0.6deg]', 'rotate-[0.4deg]'][i % 3]}`} />
           </div>
         ))}
       </div>
@@ -82,28 +122,33 @@ const allTags = [...new Set(posts.flatMap((p) => p.data.tags))];
 </BaseLayout>
 
 <script>
+  // 标签筛选:全部时显示特色大卡,筛选时用同文章的普通卡替代,保证网格不留洞
   const setupFilter = () => {
     const buttons = document.querySelectorAll<HTMLButtonElement>('.tag-btn');
     const items = document.querySelectorAll<HTMLElement>('.article-item');
+    if (buttons.length === 0) return;
     const setActive = (btn: Element) => {
       buttons.forEach((b) => {
-        b.classList.remove('active', 'bg-grass-600', 'text-white');
-        b.classList.add('bg-white', 'text-grass-700');
+        b.classList.remove('active', 'bg-sun-400');
+        b.classList.add('bg-card', 'text-ink/70');
       });
-      btn.classList.add('active', 'bg-grass-600', 'text-white');
-      btn.classList.remove('bg-white', 'text-grass-700');
+      btn.classList.add('active', 'bg-sun-400');
+      btn.classList.remove('bg-card', 'text-ink/70');
     };
     buttons.forEach((btn) => {
       btn.addEventListener('click', () => {
-        const tag = btn.dataset.tag;
+        const tag = btn.dataset.tag!;
         setActive(btn);
         items.forEach((item) => {
           const tags = (item.dataset.tags || '').split(',');
-          item.style.display = tag === 'all' || tags.includes(tag!) ? '' : 'none';
+          let show = tag === 'all' || tags.includes(tag);
+          if (item.classList.contains('feat-full') && tag !== 'all') show = false;
+          if (item.classList.contains('feat-compact') && tag === 'all') show = false;
+          item.style.display = show ? '' : 'none';
         });
       });
     });
   };
   setupFilter();
-  document.addEventListener('astro:after-swap', setupFilter);
+  document.addEventListener('astro:page-load', setupFilter);
 </script>

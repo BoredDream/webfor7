@@ -1,37 +1,58 @@
 ---
 import type { Course } from '../data/courses';
-interface Props { course: Course }
-const { course } = Astro.props;
+import { getMember } from '../data/team';
+import { catColor } from './categoryColors';
 
-const catColor: Record<Course['category'], string> = {
-  科学: 'bg-sky-100 text-sky-700',
-  人文: 'bg-amber-100 text-amber-700',
-  艺术: 'bg-pink-100 text-pink-700',
-  素养: 'bg-grass-100 text-grass-700',
-};
+interface Props {
+  course: Course;
+  /** featured:横向大卡(bento 首卡);normal:标准卡 */
+  size?: 'featured' | 'normal';
+  class?: string;
+}
+const { course, size = 'normal', class: cls = '' } = Astro.props;
+const color = catColor[course.category];
+const teacher = getMember(course.teacherId);
 ---
 
-<a
-  href={`/courses/${course.id}`}
-  class="group block bg-white rounded-3xl p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all border border-grass-100"
->
-  <div class="flex items-start justify-between mb-4">
-    <span class="text-4xl group-hover:scale-110 transition-transform">{course.emoji}</span>
-    <span class={`text-xs font-medium px-2.5 py-1 rounded-full ${catColor[course.category]}`}>
-      {course.category}
-    </span>
-  </div>
-  <h3 class="text-xl font-bold text-gray-900 mb-1 group-hover:text-grass-700 transition-colors">
-    {course.title}
-  </h3>
-  <p class="text-sm text-grass-600 font-medium mb-3">面向 {course.audience}</p>
-  <p class="text-gray-600 text-sm leading-relaxed mb-4">{course.goal}</p>
-  <ul class="flex flex-wrap gap-2">
-    {course.highlights.map((h) => (
-      <li class="text-xs bg-grass-50 text-grass-700 px-2.5 py-1 rounded-full">{h}</li>
-    ))}
-  </ul>
-  <span class="inline-flex items-center gap-1 text-sm text-grass-600 font-medium mt-4 group-hover:gap-2 transition-all">
-    查看课程详情 →
-  </span>
-</a>
+{size === 'featured' ? (
+  <a href={`/courses/${course.id}`} class={`sticker-card group grid sm:grid-cols-5 overflow-hidden h-full ${cls}`}>
+    <span class="tape" aria-hidden="true"></span>
+    <div class={`sm:col-span-2 relative min-h-44 grid place-items-center border-b-2 sm:border-b-0 sm:border-r-2 border-ink/15 ${color.soft}`}>
+      <span class="text-7xl transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">{course.emoji}</span>
+      <span class={`absolute right-3 top-3 rounded-full px-2.5 py-1 text-xs font-bold ${color.chip}`}>{course.category}类</span>
+    </div>
+    <div class="sm:col-span-3 p-7 flex flex-col">
+      <h3 class="font-display text-2xl text-ink">{course.title}</h3>
+      <p class="text-sm font-bold text-ink/50 mt-0.5">面向 {course.audience}{teacher && ` · ${teacher.name} 老师`}</p>
+      <p class="mt-3 text-sm text-ink/65 leading-relaxed font-medium">{course.intro[0]}</p>
+      <div class="mt-4 flex flex-wrap gap-1.5">
+        {course.highlights.map((h) => (
+          <span class="rounded-full border-2 border-ink/10 px-2.5 py-1 text-xs font-bold text-ink/60">{h}</span>
+        ))}
+      </div>
+      <span class="mt-auto pt-4 inline-flex items-center gap-1 text-sm font-bold text-ink/55 group-hover:gap-2 transition-all">
+        查看课程详情 →
+      </span>
+    </div>
+  </a>
+) : (
+  <a href={`/courses/${course.id}`} class={`sticker-card group flex flex-col overflow-hidden h-full ${cls}`}>
+    <div class={`relative h-24 grid place-items-center border-b-2 border-ink/15 ${color.soft}`}>
+      <span class="text-5xl transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">{course.emoji}</span>
+      <span class={`absolute right-3 top-3 rounded-full px-2.5 py-1 text-xs font-bold ${color.chip}`}>{course.category}类</span>
+    </div>
+    <div class="p-6 flex flex-col flex-1">
+      <h3 class="font-display text-xl text-ink">{course.title}</h3>
+      <p class="text-sm font-bold text-ink/50 mt-0.5">面向 {course.audience}</p>
+      <p class="mt-2.5 text-sm text-ink/65 leading-relaxed font-medium flex-1">{course.goal}</p>
+      <div class="mt-4 flex flex-wrap gap-1.5">
+        {course.highlights.slice(0, 2).map((h) => (
+          <span class="rounded-full border-2 border-ink/10 px-2.5 py-1 text-xs font-bold text-ink/60">{h}</span>
+        ))}
+      </div>
+      <span class="mt-4 inline-flex items-center gap-1 text-sm font-bold text-ink/55 group-hover:gap-2 transition-all">
+        查看课程详情 →
+      </span>
+    </div>
+  </a>
+)}

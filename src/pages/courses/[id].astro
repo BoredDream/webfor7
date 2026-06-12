@@ -1,7 +1,11 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { courses, getCourse } from '../../data/courses';
+import BackLink from '../../components/BackLink.astro';
+import CourseCard from '../../components/CourseCard.astro';
+import SectionTitle from '../../components/SectionTitle.astro';
+import { courses } from '../../data/courses';
 import { getMember } from '../../data/team';
+import { catColor } from '../../components/categoryColors';
 
 export async function getStaticPaths() {
   return courses.map((course) => ({ params: { id: course.id }, props: { course } }));
@@ -9,68 +13,85 @@ export async function getStaticPaths() {
 
 const { course } = Astro.props;
 const teacher = getMember(course.teacherId);
+const color = catColor[course.category];
+const related = courses.filter((c) => c.category === course.category && c.id !== course.id);
 ---
 
 <BaseLayout title={course.title} description={course.goal}>
   <div class="mx-auto max-w-3xl px-4 py-12">
-    <a href="/courses" class="text-sm text-grass-600 hover:underline">← 返回课程安排</a>
+    <BackLink fallback="/courses" label="返回课程安排" />
 
-    <header class="mt-6 mb-8 flex items-start gap-4">
-      <span class="text-6xl">{course.emoji}</span>
+    <header class="mt-6 mb-9 flex items-start gap-5">
+      <span class={`sticker-chip grid h-20 w-20 shrink-0 place-items-center rounded-2xl text-5xl -rotate-3 ${color.soft}`}>{course.emoji}</span>
       <div>
-        <span class="text-xs font-medium bg-grass-100 text-grass-700 px-2.5 py-1 rounded-full">{course.category}类</span>
-        <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mt-2">{course.title}</h1>
-        <p class="text-grass-600 font-medium mt-1">面向 {course.audience}</p>
+        <span class={`rounded-full px-2.5 py-1 text-xs font-bold ${color.chip}`}>{course.category}类</span>
+        <h1 class="font-display text-3xl md:text-4xl text-ink mt-2">{course.title}</h1>
+        <p class="text-ink/55 font-bold mt-1">面向 {course.audience}</p>
       </div>
     </header>
 
     <!-- 课程介绍 -->
-    <section class="bg-white rounded-3xl p-6 shadow-sm border border-grass-100 mb-6">
-      <h2 class="text-lg font-bold text-gray-900 mb-3">课程介绍</h2>
-      <div class="space-y-3 text-gray-700 leading-relaxed">
+    <section class="sticker-card p-7 mb-8 -rotate-[0.3deg]">
+      <span class="tape" aria-hidden="true"></span>
+      <h2 class="font-display text-xl text-ink mb-3"><span class="hl-sun">课程介绍</span></h2>
+      <div class="space-y-3 text-ink/75 leading-relaxed font-medium">
         {course.intro.map((p) => <p>{p}</p>)}
       </div>
       <div class="mt-5 flex flex-wrap gap-2">
         {course.highlights.map((h) => (
-          <span class="text-xs bg-grass-50 text-grass-700 px-2.5 py-1 rounded-full">{h}</span>
+          <span class="rounded-full border-2 border-ink/10 px-2.5 py-1 text-xs font-bold text-ink/60">{h}</span>
         ))}
       </div>
     </section>
 
-    <div class="grid sm:grid-cols-2 gap-6">
+    <div class="grid sm:grid-cols-2 gap-7">
       <!-- 任课老师 -->
       {teacher && (
-        <a href={`/team/${teacher.id}`} class="group bg-white rounded-3xl p-6 shadow-sm border border-grass-100 hover:shadow-lg transition-all">
-          <h2 class="text-sm font-semibold text-gray-400 mb-3">任课老师</h2>
+        <a href={`/team/${teacher.id}`} class="sticker-card group p-6 rotate-[0.5deg]">
+          <h2 class="text-xs font-bold text-ink/40 mb-3 tracking-widest">任课老师</h2>
           <div class="flex items-center gap-3">
-            <span class="text-4xl">{teacher.avatar}</span>
+            <span class="sticker-chip grid h-14 w-14 place-items-center rounded-full bg-card text-3xl -rotate-3">{teacher.avatar}</span>
             <div>
-              <div class="font-bold text-gray-900 group-hover:text-grass-700 transition-colors">{teacher.name}</div>
-              <div class="text-sm text-grass-600">{teacher.role}</div>
+              <div class="font-display text-lg text-ink">{teacher.name}</div>
+              <div class="text-sm font-bold text-ink/50">{teacher.role}</div>
             </div>
           </div>
-          <span class="text-sm text-grass-600 mt-3 inline-block">查看老师介绍 →</span>
+          <span class="mt-4 inline-flex items-center gap-1 text-sm font-bold text-ink/55 group-hover:gap-2 transition-all">查看老师介绍 →</span>
         </a>
       )}
 
       <!-- 资源 -->
-      <div class="bg-white rounded-3xl p-6 shadow-sm border border-grass-100">
-        <h2 class="text-sm font-semibold text-gray-400 mb-3">课程资源</h2>
+      <div class="sticker-card p-6 -rotate-[0.5deg]">
+        <h2 class="text-xs font-bold text-ink/40 mb-3 tracking-widest">课程资源</h2>
         <div class="space-y-3">
           {course.coursewareUrl ? (
-            <a href={course.coursewareUrl} download class="flex items-center gap-2 text-grass-700 font-medium hover:underline">
+            <a href={course.coursewareUrl} download class="sticker-btn bg-sun-400 !px-4 !py-2 text-sm">
               📥 下载课件
             </a>
           ) : (
-            <p class="text-sm text-gray-400">课件整理中…</p>
+            <p class="text-sm font-medium text-ink/40">课件整理中…</p>
           )}
           {course.videoUrl && (
-            <a href={course.videoUrl} target="_blank" rel="noopener" class="flex items-center gap-2 text-sky-deep font-medium hover:underline">
-              ▶️ 观看趣味科普视频
-            </a>
+            <div>
+              <a href={course.videoUrl} target="_blank" rel="noopener" class="sticker-btn bg-card !px-4 !py-2 text-sm">
+                ▶️ 观看趣味科普视频
+              </a>
+            </div>
           )}
         </div>
       </div>
     </div>
+
+    <!-- 相关推荐 -->
+    {related.length > 0 && (
+      <section class="mt-14">
+        <SectionTitle title={`更多${course.category}类课程`} emoji="🔎" hl="grass" />
+        <div class="mt-6 grid gap-7 sm:grid-cols-2">
+          {related.map((c, i) => (
+            <CourseCard course={c} class={i % 2 ? '-rotate-[0.5deg]' : 'rotate-[0.5deg]'} />
+          ))}
+        </div>
+      </section>
+    )}
   </div>
 </BaseLayout>

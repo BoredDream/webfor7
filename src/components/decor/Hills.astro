@@ -1,0 +1,19 @@
+---
+// 手绘山丘分隔(页面分节衔接用)
+interface Props {
+  /** 山丘下方衔接的背景色,默认纸面色 */
+  class?: string;
+  flip?: boolean;
+}
+const { class: cls = '', flip = false } = Astro.props;
+---
+
+<svg
+  class={`block w-full ${flip ? 'rotate-180' : ''} ${cls}`}
+  viewBox="0 0 1440 90"
+  preserveAspectRatio="none"
+  aria-hidden="true"
+>
+  <path d="M0,90 L0,60 Q240,10 480,52 Q720,90 960,42 Q1200,2 1440,48 L1440,90 Z" fill="#b5dba2" />
+  <path d="M0,90 L0,74 Q300,40 640,70 Q1000,96 1440,64 L1440,90 Z" fill="#8cc97a" />
+</svg>

@@ -1,0 +1,67 @@
+---
+// 手绘涂鸦装饰(内联 SVG,无外部资源)
+interface Props {
+  variant: 'sun' | 'cloud' | 'arrow' | 'sparkle' | 'flag';
+  class?: string;
+}
+const { variant, class: cls = '' } = Astro.props;
+---
+
+{variant === 'sun' && (
+  <svg class={`doodle-sun ${cls}`} viewBox="0 0 120 120" aria-hidden="true">
+    <circle cx="60" cy="60" r="26" fill="#ffc83d" stroke="#3d2c1e" stroke-width="3" />
+    <g stroke="#3d2c1e" stroke-width="3" stroke-linecap="round">
+      <path d="M60 14 L60 26" /><path d="M60 94 L60 106" /><path d="M14 60 L26 60" /><path d="M94 60 L106 60" />
+      <path d="M28 28 L36 36" /><path d="M84 84 L92 92" /><path d="M92 28 L84 36" /><path d="M36 84 L28 92" />
+    </g>
+    <path d="M50 64 Q60 72 70 64" fill="none" stroke="#3d2c1e" stroke-width="3" stroke-linecap="round" />
+    <circle cx="50" cy="54" r="2.5" fill="#3d2c1e" /><circle cx="70" cy="54" r="2.5" fill="#3d2c1e" />
+  </svg>
+)}
+
+{variant === 'cloud' && (
+  <svg class={`doodle-cloud ${cls}`} viewBox="0 0 100 50" aria-hidden="true">
+    <path d="M20 38 Q8 38 10 28 Q12 18 24 20 Q26 8 40 10 Q54 12 52 22 Q66 18 68 28 Q70 38 56 38 Z" fill="#fff" stroke="#3d2c1e" stroke-width="2.5" stroke-linejoin="round" />
+  </svg>
+)}
+
+{variant === 'arrow' && (
+  <svg class={cls} viewBox="0 0 80 40" aria-hidden="true">
+    <path d="M4 8 Q40 36 68 22" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-dasharray="1 7" />
+    <path d="M58 16 L70 21 L62 30" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+  </svg>
+)}
+
+{variant === 'sparkle' && (
+  <svg class={cls} viewBox="0 0 40 40" aria-hidden="true">
+    <path d="M20 4 Q22 16 36 20 Q22 24 20 36 Q18 24 4 20 Q18 16 20 4 Z" fill="#ffc83d" stroke="#3d2c1e" stroke-width="2" stroke-linejoin="round" />
+  </svg>
+)}
+
+{variant === 'flag' && (
+  <svg class={cls} viewBox="0 0 40 48" aria-hidden="true">
+    <path d="M10 4 L10 44" stroke="#3d2c1e" stroke-width="3" stroke-linecap="round" />
+    <path d="M12 6 Q22 2 32 8 L32 22 Q22 16 12 20 Z" fill="#ff8a65" stroke="#3d2c1e" stroke-width="2.5" stroke-linejoin="round" />
+  </svg>
+)}
+
+<style>
+  .doodle-sun {
+    animation: sun-sway 7s ease-in-out infinite;
+    transform-origin: center;
+  }
+  @keyframes sun-sway {
+    0%, 100% { transform: rotate(-6deg); }
+    50% { transform: rotate(8deg); }
+  }
+  .doodle-cloud {
+    animation: cloud-x 11s ease-in-out infinite;
+  }
+  @keyframes cloud-x {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(26px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .doodle-sun, .doodle-cloud { animation: none; }
+  }
+</style>

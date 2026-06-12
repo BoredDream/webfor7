@@ -1,8 +1,12 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { classes, getClass, ageGroups } from '../../data/classes';
+import BackLink from '../../components/BackLink.astro';
+import ClassCard from '../../components/ClassCard.astro';
+import SectionTitle from '../../components/SectionTitle.astro';
+import { classes, ageGroups, classesByGroup } from '../../data/classes';
 import { getMember } from '../../data/team';
 import { getCourse } from '../../data/courses';
+import { catColor } from '../../components/categoryColors';
 
 export async function getStaticPaths() {
   return classes.map((cls) => ({ params: { id: cls.id }, props: { cls } }));
@@ -11,94 +15,175 @@ export async function getStaticPaths() {
 const { cls } = Astro.props;
 const head = getMember(cls.headTeacherId);
 const group = ageGroups.find((g) => g.id === cls.ageGroupId);
+
+// 课表按上午 / 下午分节(解析 time 字符串的首个小时数,纯展示层逻辑)
+const hourOf = (time: string) => parseInt(time, 10) || 0;
+const morning = cls.timetable.filter((t) => hourOf(t.time) < 12);
+const afternoon = cls.timetable.filter((t) => hourOf(t.time) >= 12);
+const periods = [
+  { label: '上午', emoji: '☀️', entries: morning },
+  { label: '下午', emoji: '🌤️', entries: afternoon },
+].filter((p) => p.entries.length > 0);
+
+// 学生档案分层:已填写在前,待填写在后
+const isFilled = (s: (typeof cls.students)[number]) => !!(s.personality || s.tutoring);
+const filledStudents = cls.students.filter(isFilled);
+const pendingStudents = cls.students.filter((s) => !isFilled(s));
+const progress = cls.students.length
+  ? Math.round((filledStudents.length / cls.students.length) * 100)
+  : 0;
+
+// 同年龄组的其他班级(相关推荐)
+const siblings = classesByGroup(cls.ageGroupId).filter((c) => c.id !== cls.id);
 ---
 
 <BaseLayout title={cls.name} description={`${cls.name} · 带班老师 ${head?.name ?? ''}`}>
   <div class="mx-auto max-w-5xl px-4 py-12">
-    <a href="/classes" class="text-sm text-grass-600 hover:underline">← 返回班级</a>
+    <BackLink fallback="/classes" label="返回班级" />
 
-    <header class="mt-6 mb-10">
-      {group && <span class="text-xs font-medium bg-grass-100 text-grass-700 px-2.5 py-1 rounded-full">{group.emoji} {group.label}</span>}
-      <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mt-2">{cls.name}</h1>
+    <header class="mt-6 mb-12">
+      {group && (
+        <span class="sticker-chip inline-block rounded-full bg-card px-3 py-1 text-xs font-bold text-ink -rotate-1">
+          {group.emoji} {group.label} · {group.desc}
+        </span>
+      )}
+      <h1 class="font-display text-4xl md:text-5xl text-ink mt-4">
+        <span class="hl-sun">{cls.name}</span>
+      </h1>
     </header>
 
     <!-- 带班老师 -->
-    <section class="mb-10">
-      <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-        <span class="w-1.5 h-6 bg-grass-500 rounded-full"></span>带班老师
-      </h2>
+    <section class="mb-12">
+      <SectionTitle title="带班老师" emoji="🧑‍🏫" hl="grass" />
       {head ? (
-        <a href={`/team/${head.id}`} class="group inline-flex items-center gap-4 bg-white rounded-3xl p-5 shadow-sm border border-grass-100 hover:shadow-lg transition-all">
-          <span class="text-5xl">{head.avatar}</span>
+        <a href={`/team/${head.id}`} class="sticker-card group mt-6 inline-flex items-center gap-5 p-6 -rotate-[0.4deg]">
+          <span class="tape" aria-hidden="true"></span>
+          <span class="sticker-chip grid h-16 w-16 shrink-0 place-items-center rounded-full bg-sun-100 text-4xl -rotate-3">{head.avatar}</span>
           <div>
-            <div class="font-bold text-gray-900 group-hover:text-grass-700 transition-colors">{head.name}</div>
-            <div class="text-sm text-grass-600">{head.role}</div>
-            <div class="text-sm text-gray-500 mt-1">{head.bio}</div>
+            <div class="font-display text-xl text-ink">{head.name}</div>
+            <div class="text-sm font-bold text-ink/50">{head.role}</div>
+            <div class="text-sm font-medium text-ink/60 mt-1">{head.bio}</div>
           </div>
+          <span class="hidden sm:inline text-ink/40 text-xl group-hover:translate-x-1 transition-transform">→</span>
         </a>
       ) : (
-        <p class="text-gray-400">带班老师待定。</p>
+        <p class="mt-6 text-ink/40 font-medium">带班老师待定。</p>
       )}
     </section>
 
-    <!-- 课表 -->
-    <section class="mb-10">
-      <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-        <span class="w-1.5 h-6 bg-grass-500 rounded-full"></span>课表
-        <span class="text-sm font-normal text-gray-400">(点击课程查看介绍 · 课件 · 视频)</span>
-      </h2>
-      <div class="bg-white rounded-3xl shadow-sm border border-grass-100 overflow-hidden divide-y divide-grass-50">
-        {cls.timetable.map((entry) => {
-          const course = getCourse(entry.courseId);
-          const teacher = course ? getMember(course.teacherId) : undefined;
-          return (
-            <a href={course ? `/courses/${course.id}` : '#'} class="group flex items-center gap-4 px-5 py-4 hover:bg-grass-50 transition-colors">
-              <span class="text-sm font-mono text-gray-500 w-32 shrink-0">{entry.time}</span>
-              <span class="text-2xl">{course?.emoji ?? '📘'}</span>
-              <div class="flex-1">
-                <div class="font-medium text-gray-900 group-hover:text-grass-700 transition-colors">{course?.title ?? entry.courseId}</div>
-                {teacher && <div class="text-xs text-gray-400">代课老师 · {teacher.name}</div>}
-              </div>
-              <span class="text-grass-400 group-hover:translate-x-1 transition-transform">→</span>
-            </a>
-          );
-        })}
+    <!-- 课表:上午 / 下午时间轴 -->
+    <section class="mb-12">
+      <SectionTitle title="一日课表" emoji="📅" hl="sky" desc="点击课程查看介绍、课件与科普视频。" />
+      <div class="mt-7 space-y-8">
+        {periods.map((period) => (
+          <div>
+            <h3 class="font-display text-lg text-ink/80 mb-4">{period.emoji} {period.label}</h3>
+            <div class="relative ml-2 space-y-5 border-l-2 border-dashed border-ink/25 pl-7">
+              {period.entries.map((entry) => {
+                const course = getCourse(entry.courseId);
+                const teacher = course ? getMember(course.teacherId) : undefined;
+                const color = course ? catColor[course.category] : catColor['素养'];
+                return (
+                  <div class="relative">
+                    <span class="absolute -left-[37px] top-6 h-3.5 w-3.5 rounded-full bg-sun-400 border-2 border-ink" aria-hidden="true"></span>
+                    <a href={course ? `/courses/${course.id}` : '#'} class="sticker-card group flex items-center gap-4 p-4 pr-5 overflow-hidden">
+                      <span class={`w-2 self-stretch rounded-full shrink-0 ${color.bar}`} aria-hidden="true"></span>
+                      <span class="font-display text-sm text-ink/60 w-28 shrink-0 leading-snug">{entry.time}</span>
+                      <span class={`grid h-12 w-12 shrink-0 place-items-center rounded-xl text-2xl ${color.soft} transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6`}>
+                        {course?.emoji ?? '📘'}
+                      </span>
+                      <div class="flex-1 min-w-0">
+                        <div class="font-display text-lg text-ink truncate">{course?.title ?? entry.courseId}</div>
+                        {teacher && <div class="text-xs font-bold text-ink/45">任课老师 · {teacher.name}</div>}
+                      </div>
+                      {course && <span class={`hidden sm:inline rounded-full px-2.5 py-1 text-xs font-bold shrink-0 ${color.chip}`}>{course.category}类</span>}
+                      <span class="text-ink/35 group-hover:translate-x-1 transition-transform" aria-hidden="true">→</span>
+                    </a>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </div>
     </section>
 
     <!-- 班级学生 -->
-    <section>
-      <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-        <span class="w-1.5 h-6 bg-grass-500 rounded-full"></span>班级学生
-        <span class="text-sm font-normal text-gray-400">共 {cls.students.length} 名</span>
-      </h2>
-      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {cls.students.map((stu) => (
-          <div class="bg-white rounded-2xl p-5 shadow-sm border border-grass-100">
-            <div class="flex items-center gap-2 mb-3">
-              <span class="w-9 h-9 rounded-full bg-grass-100 text-grass-700 flex items-center justify-center font-bold">{stu.name.slice(-1)}</span>
-              <span class="font-bold text-gray-900">{stu.name}</span>
-            </div>
-            <dl class="text-sm space-y-2">
-              <div>
-                <dt class="text-gray-400 text-xs">性格特点</dt>
-                <dd class={stu.personality ? 'text-gray-700' : 'text-gray-300 italic'}>
-                  {stu.personality || '待带班老师填写'}
-                </dd>
-              </div>
-              <div>
-                <dt class="text-gray-400 text-xs">个性化辅导</dt>
-                <dd class={stu.tutoring ? 'text-gray-700' : 'text-gray-300 italic'}>
-                  {stu.tutoring || '待带班老师填写'}
-                </dd>
-              </div>
-            </dl>
-          </div>
-        ))}
+    <section class="mb-12">
+      <SectionTitle title="班级学生" emoji="📒" hl="pink" />
+
+      <!-- 档案完成度 -->
+      <div class="mt-6 mb-7 sticker-card p-5 rotate-[0.3deg]">
+        <div class="flex items-center justify-between text-sm font-bold text-ink/60 mb-2">
+          <span>学生档案整理进度</span>
+          <span>已整理 {filledStudents.length} / 共 {cls.students.length} 名</span>
+        </div>
+        <div class="h-3 rounded-full bg-ink/10 overflow-hidden">
+          <div class="h-full rounded-full bg-grass-400 border-r-2 border-ink/30" style={`width:${progress}%`}></div>
+        </div>
       </div>
-      <p class="text-xs text-gray-400 mt-4">
+
+      {filledStudents.length > 0 && (
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-8">
+          {filledStudents.map((stu, i) => (
+            <div class={`sticker-card p-5 ${i % 2 ? 'rotate-[0.5deg]' : '-rotate-[0.5deg]'}`}>
+              <div class="flex items-center gap-3 mb-3">
+                <span class="sticker-chip grid h-10 w-10 place-items-center rounded-full bg-sun-300 font-display text-base text-ink">{stu.name.slice(-1)}</span>
+                <div>
+                  <span class="font-display text-lg text-ink">{stu.name}</span>
+                  <p class="text-xs font-bold text-grass-700">档案已整理 ✓</p>
+                </div>
+              </div>
+              <dl class="text-sm space-y-2.5 font-medium">
+                {stu.personality && (
+                  <div>
+                    <dt class="text-xs font-bold text-ink/40">性格特点</dt>
+                    <dd class="text-ink/75">{stu.personality}</dd>
+                  </div>
+                )}
+                {stu.tutoring && (
+                  <div>
+                    <dt class="text-xs font-bold text-ink/40">个性化辅导</dt>
+                    <dd class="text-ink/75">{stu.tutoring}</dd>
+                  </div>
+                )}
+              </dl>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {pendingStudents.length > 0 && (
+        <>
+          <p class="text-sm font-bold text-ink/45 mb-3">⏳ 待整理({pendingStudents.length} 名)</p>
+          <div class="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
+            {pendingStudents.map((stu) => (
+              <div class="placeholder-card p-4 flex items-center gap-3">
+                <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full border-2 border-dashed border-ink/20 font-display text-base text-ink/35">{stu.name.slice(-1)}</span>
+                <div class="min-w-0">
+                  <p class="font-display text-base text-ink/50 truncate">{stu.name}</p>
+                  <span class="inline-block rounded-full bg-sun-200/50 text-ink/55 text-xs font-bold px-2 py-0.5 mt-0.5">✍️ 待填写</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      <p class="text-xs font-medium text-ink/40 mt-5">
         提示:学生性格与个性化辅导内容在 <code>src/data/classes.ts</code> 中由带班老师整理后填入。
       </p>
     </section>
+
+    <!-- 相关推荐:同年龄组其他班级 -->
+    {siblings.length > 0 && (
+      <section>
+        <SectionTitle title={`${group?.label ?? ''} 的其他班级`} emoji="🏫" hl="grass" />
+        <div class="mt-6 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
+          {siblings.map((c, i) => <ClassCard cls={c} class={i % 2 ? '-rotate-[0.5deg]' : 'rotate-[0.5deg]'} />)}
+        </div>
+        <a href="/classes" class="sticker-btn bg-card mt-8 text-sm">查看全部班级 →</a>
+      </section>
+    )}
   </div>
 </BaseLayout>

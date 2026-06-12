@@ -1,0 +1,50 @@
+---
+// 数字滚动:进入视口后从 0 滚到目标值;无 JS / reduced-motion 时直接显示终值
+interface Props {
+  /** 含数字的字符串,如 "240" 或 "600" */
+  value: string;
+  class?: string;
+}
+const { value, class: cls = '' } = Astro.props;
+const num = parseInt(value.replace(/\D/g, ''), 10) || 0;
+---
+
+<span class={`tabular-nums ${cls}`} data-counter={num}>{num}</span>
+
+<script>
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
+
+  const animate = (el: HTMLElement) => {
+    const target = parseInt(el.dataset.counter || '0', 10);
+    if (!target) return;
+    const t0 = performance.now();
+    const tick = (now: number) => {
+      const p = Math.min(1, (now - t0) / 1300);
+      el.textContent = String(Math.round(target * easeOut(p)));
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  };
+
+  const init = () => {
+    document.querySelectorAll<HTMLElement>('[data-counter]:not([data-counter-ready])').forEach((el) => {
+      el.setAttribute('data-counter-ready', '');
+      if (reduced) return; // 直接保留 SSR 渲染的终值
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const en of entries) {
+            if (!en.isIntersecting) continue;
+            io.unobserve(en.target);
+            animate(en.target as HTMLElement);
+          }
+        },
+        { threshold: 0.4 }
+      );
+      io.observe(el);
+    });
+  };
+
+  init();
+  document.addEventListener('astro:page-load', init);
+</script>

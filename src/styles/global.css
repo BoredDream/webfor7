@@ -1,8 +1,15 @@
 @import "tailwindcss";
 
-/* ===== 清新 / 教育感 主题 token ===== */
+/* ===== 「阳光画本」主题 token ===== */
 @theme {
-  /* 主色:草绿 */
+  /* 纸面与墨色 */
+  --color-paper: #fff6e3;
+  --color-card: #fffdf6;
+  --color-ink: #3d2c1e;
+  /* 兼容旧名:cream 即纸面色 */
+  --color-cream: #fff6e3;
+
+  /* 草绿(山丘 / 辅色) */
   --color-grass-50: #f0fdf4;
   --color-grass-100: #dcfce7;
   --color-grass-200: #bbf7d0;
@@ -12,36 +19,148 @@
   --color-grass-600: #16a34a;
   --color-grass-700: #15803d;
 
-  /* 辅色:天蓝 */
-  --color-sky-soft: #38bdf8;
-  --color-sky-deep: #0284c7;
+  /* 暖阳(主强调色) */
+  --color-sun-100: #fff3cf;
+  --color-sun-200: #ffe8a3;
+  --color-sun-300: #ffd98f;
+  --color-sun-400: #ffc83d;
+  --color-sun-500: #f5a31d;
 
-  /* 点缀:暖橙 */
-  --color-sun-300: #fcd34d;
-  --color-sun-400: #fbbf24;
-  --color-sun-500: #f59e0b;
+  /* 蜡笔分类色:科学-天蓝 / 人文-杏黄 / 艺术-粉 / 素养-草绿 */
+  --color-csky-100: #dbeefe;
+  --color-csky-300: #bfdcf8;
+  --color-csky-700: #1d4f8c;
+  --color-camber-100: #ffe8c2;
+  --color-camber-300: #ffd98f;
+  --color-camber-700: #8c5a1d;
+  --color-cpink-100: #ffdbe4;
+  --color-cpink-300: #ffc2d2;
+  --color-cpink-700: #9c2d52;
+  --color-cgrass-100: #dcf5d3;
+  --color-cgrass-300: #bfe9b0;
+  --color-cgrass-700: #2e6b1d;
 
-  /* 背景:暖白 */
-  --color-cream: #fffdf7;
-
-  /* 圆体 / 系统字体,离线友好 */
-  --font-display: "PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* 手写感标题:楷体系统字体栈,离线可用 */
+  --font-display: "Kaiti SC", "STKaiti", "KaiTi", "DFKai-SB", "AR PL UKai CN", "Noto Serif CJK SC", serif;
+  /* 正文:圆润系统字体 */
   --font-sans: "PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* 圆角层级:贴纸卡 / 大面板 / 胶囊 */
+  --radius-card: 1.25rem;
+  --radius-panel: 1.75rem;
+  --radius-chip: 9999px;
 }
 
 html {
   scroll-behavior: smooth;
   font-family: var(--font-sans);
-  color: #1f2937;
-  background: var(--color-cream);
+  color: #46362a;
+  background: var(--color-paper);
 }
 
-/* 首页全屏分节滚动 */
-.snap-container {
-  scroll-snap-type: y proximity;
+/* 纸面:暖黄底 + 笔记本点阵 */
+.paper-bg {
+  background-color: var(--color-paper);
+  background-image: radial-gradient(rgba(61, 44, 30, 0.07) 1.2px, transparent 1.2px);
+  background-size: 22px 22px;
 }
-.snap-section {
-  scroll-snap-align: start;
+
+/* ===== 贴纸卡片体系 ===== */
+.sticker-card {
+  position: relative;
+  background: var(--color-card);
+  border: 2px solid rgba(61, 44, 30, 0.8);
+  border-radius: var(--radius-card);
+  box-shadow: 5px 6px 0 rgba(61, 44, 30, 0.18);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+a.sticker-card:hover {
+  transform: translateY(-4px) rotate(0deg) !important;
+  box-shadow: 7px 9px 0 rgba(61, 44, 30, 0.22);
+}
+
+/* 胶带贴角(放在 .sticker-card 内) */
+.tape {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  width: 72px;
+  height: 22px;
+  margin-left: -36px;
+  background: rgba(255, 200, 61, 0.55);
+  border: 1.5px dashed rgba(61, 44, 30, 0.25);
+  transform: rotate(-3deg);
+  border-radius: 2px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* 小贴纸(徽章 / 头像底) */
+.sticker-chip {
+  border: 2px solid rgba(61, 44, 30, 0.8);
+  box-shadow: 2px 3px 0 rgba(61, 44, 30, 0.16);
+}
+
+/* 贴纸按钮:配合 bg-sun-400 / bg-card 等背景类使用 */
+.sticker-btn {
+  display: inline-block;
+  border: 2px solid var(--color-ink);
+  border-radius: var(--radius-chip);
+  padding: 0.7rem 1.7rem;
+  font-weight: 800;
+  color: var(--color-ink);
+  box-shadow: 4px 5px 0 rgba(61, 44, 30, 0.8);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.sticker-btn:hover {
+  transform: translate(2px, 3px);
+  box-shadow: 1px 1px 0 rgba(61, 44, 30, 0.8);
+}
+
+/* 导航胶囊 */
+.sticker-pill {
+  border: 2px solid rgba(61, 44, 30, 0.75);
+  border-radius: var(--radius-chip);
+  padding: 0.4rem 1rem;
+  box-shadow: 2px 2.5px 0 rgba(61, 44, 30, 0.5);
+}
+.sticker-pill-ghost {
+  border: 2px solid transparent;
+  border-radius: var(--radius-chip);
+  padding: 0.4rem 1rem;
+  transition: border-color 0.2s ease;
+}
+.sticker-pill-ghost:hover {
+  border-color: rgba(61, 44, 30, 0.3);
+}
+
+/* 待填写占位卡:与已填写内容明显区分 */
+.placeholder-card {
+  border: 2px dashed rgba(61, 44, 30, 0.25);
+  border-radius: var(--radius-card);
+  background: rgba(255, 253, 246, 0.5);
+}
+
+/* ===== 蜡笔高亮笔触(标题用) ===== */
+.hl-sun,
+.hl-grass,
+.hl-sky,
+.hl-pink {
+  position: relative;
+  display: inline-block;
+  padding: 0 0.12em;
+  border-radius: 0.3em 0.5em 0.4em 0.6em;
+  box-decoration-break: clone;
+  background: linear-gradient(104deg, transparent 2%, rgba(255, 200, 61, 0.75) 6%, rgba(255, 200, 61, 0.6) 94%, transparent 98%);
+}
+.hl-grass {
+  background: linear-gradient(104deg, transparent 2%, rgba(140, 201, 122, 0.7) 6%, rgba(140, 201, 122, 0.55) 94%, transparent 98%);
+}
+.hl-sky {
+  background: linear-gradient(104deg, transparent 2%, rgba(191, 220, 248, 0.85) 6%, rgba(191, 220, 248, 0.65) 94%, transparent 98%);
+}
+.hl-pink {
+  background: linear-gradient(104deg, transparent 2%, rgba(255, 194, 210, 0.85) 6%, rgba(255, 194, 210, 0.65) 94%, transparent 98%);
 }
 
 /* 简单进入动画 */
@@ -56,41 +175,46 @@ html {
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .float-in { animation: none; }
+  .sticker-card, .sticker-btn { transition: none; }
 }
 
-/* 文章正文排版 */
+/* 文章正文排版(画本风) */
 .prose-body {
   line-height: 1.9;
   font-size: 1.05rem;
-  color: #374151;
+  color: #4a3a2b;
 }
 .prose-body h2 {
-  font-size: 1.6rem;
+  font-family: var(--font-display);
+  font-size: 1.65rem;
   font-weight: 700;
   margin: 2rem 0 1rem;
-  color: var(--color-grass-700);
+  color: var(--color-ink);
 }
 .prose-body h3 {
-  font-size: 1.25rem;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
   font-weight: 700;
   margin: 1.5rem 0 0.75rem;
-  color: #111827;
+  color: var(--color-ink);
 }
 .prose-body p { margin: 1rem 0; }
+.prose-body strong { color: var(--color-ink); }
 .prose-body ul { margin: 1rem 0; padding-left: 1.5rem; list-style: disc; }
 .prose-body ol { margin: 1rem 0; padding-left: 1.5rem; list-style: decimal; }
 .prose-body li { margin: 0.35rem 0; }
-.prose-body a { color: var(--color-grass-600); text-decoration: underline; }
-.prose-body img { border-radius: 1rem; margin: 1.5rem 0; box-shadow: 0 10px 30px -12px rgba(0,0,0,0.25); }
+.prose-body a { color: var(--color-grass-700); text-decoration: underline; text-decoration-style: wavy; text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+.prose-body img { border-radius: 1rem; margin: 1.5rem 0; border: 2px solid rgba(61, 44, 30, 0.8); box-shadow: 5px 6px 0 rgba(61, 44, 30, 0.18); }
 .prose-body blockquote {
-  border-left: 4px solid var(--color-grass-300);
-  padding-left: 1rem;
-  color: #6b7280;
-  font-style: italic;
+  border-left: 4px solid var(--color-sun-400);
+  background: rgba(255, 200, 61, 0.12);
+  border-radius: 0 0.75rem 0.75rem 0;
+  padding: 0.5rem 1rem;
+  color: #6b5949;
   margin: 1.25rem 0;
 }
 .prose-body code {
-  background: var(--color-grass-50);
+  background: rgba(255, 200, 61, 0.25);
   padding: 0.15rem 0.4rem;
   border-radius: 0.35rem;
   font-size: 0.9em;

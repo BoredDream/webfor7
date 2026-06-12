@@ -1,0 +1,50 @@
+---
+// 班级卡:班名 + 年龄组徽章 + 带班老师 + 一日课表预览色块 + 学生数
+import type { SchoolClass } from '../data/classes';
+import { ageGroups } from '../data/classes';
+import { getCourse } from '../data/courses';
+import { getMember } from '../data/team';
+import { catColor } from './categoryColors';
+
+interface Props {
+  cls: SchoolClass;
+  class?: string;
+}
+const { cls, class: clsName = '' } = Astro.props;
+const head = getMember(cls.headTeacherId);
+const group = ageGroups.find((g) => g.id === cls.ageGroupId);
+---
+
+<a href={`/classes/${cls.id}`} class={`sticker-card group p-6 flex flex-col gap-4 ${clsName}`}>
+  <div class="flex items-center justify-between gap-2">
+    <h3 class="font-display text-2xl text-ink">{group?.emoji} {cls.name}</h3>
+    {group && <span class="rounded-full bg-sun-200/70 px-2.5 py-1 text-xs font-bold text-ink shrink-0">{group.label}</span>}
+  </div>
+
+  <div class="flex items-center gap-2.5 text-sm font-medium text-ink/70">
+    <span class="sticker-chip grid h-10 w-10 place-items-center rounded-full bg-card text-lg -rotate-3">{head?.avatar ?? '👤'}</span>
+    带班老师 · <b class="text-ink font-bold">{head?.name ?? '待定'}</b>
+  </div>
+
+  <div>
+    <p class="text-xs font-bold text-ink/40 mb-1.5">一日课表</p>
+    <div class="flex flex-wrap gap-1.5">
+      {cls.timetable.map((t) => {
+        const course = getCourse(t.courseId);
+        const color = course ? catColor[course.category] : catColor['素养'];
+        return (
+          <span
+            class={`grid h-9 w-9 place-items-center rounded-xl border-2 border-ink/15 text-base ${color.soft}`}
+            title={`${t.time} ${course?.title ?? t.courseId}`}
+          >
+            {course?.emoji ?? '📘'}
+          </span>
+        );
+      })}
+    </div>
+  </div>
+
+  <p class="text-sm font-bold text-ink/45 border-t-2 border-dashed border-ink/15 pt-3 mt-auto">
+    👧 {cls.students.length} 名学生 · 📅 {cls.timetable.length} 节课/天
+  </p>
+</a>
