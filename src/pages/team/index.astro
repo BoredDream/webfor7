@@ -4,9 +4,6 @@ import PageHeader from '../../components/PageHeader.astro';
 import TeamCard from '../../components/TeamCard.astro';
 import { members } from '../../data/team';
 
-// 队长放 bento 大卡,其余标准卡
-const leader = members.find((m) => m.role.includes('队长')) ?? members[0];
-const rest = members.filter((m) => m !== leader);
 const rotations = ['rotate-[0.7deg]', '-rotate-[0.6deg]', 'rotate-[0.4deg]', '-rotate-[0.8deg]'];
 ---
 
@@ -20,10 +17,7 @@ const rotations = ['rotate-[0.7deg]', '-rotate-[0.6deg]', 'rotate-[0.4deg]', '-r
 
   <div class="mx-auto max-w-6xl px-4 py-12">
     <div class="grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
-      <div class="sm:col-span-2 lg:row-span-2">
-        <TeamCard member={leader} size="featured" class="-rotate-[0.4deg]" />
-      </div>
-      {rest.map((member, i) => (
+      {members.map((member, i) => (
         <TeamCard member={member} class={rotations[i % rotations.length]} />
       ))}
     </div>
