@@ -1,0 +1,38 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import ClassCard from '../../components/ClassCard.astro';
+import SectionTitle from '../../components/SectionTitle.astro';
+import { ageGroups, classesByGroup } from '../../data/classes';
+
+const hls = ['sun', 'grass', 'sky'] as const;
+const rotations = ['rotate-[0.6deg]', '-rotate-[0.7deg]', 'rotate-[0.4deg]'];
+---
+
+<BaseLayout title="班级">
+  <PageHeader
+    emoji="🏫"
+    title="班级"
+    hl="sky"
+    subtitle="我们按年龄把孩子分成不同班级,每个班级都有专属的带班老师、课表与学生。点击班级了解详情。"
+  />
+
+  <div class="mx-auto max-w-6xl px-4 py-12 space-y-14">
+    {ageGroups.map((group, gi) => {
+      const list = classesByGroup(group.id);
+      return (
+        <section>
+          <SectionTitle title={`${group.emoji} ${group.label}`} hl={hls[gi % hls.length]} desc={group.desc} />
+
+          {list.length === 0 ? (
+            <p class="mt-6 text-sm font-medium text-ink/40">该年龄段暂未设置班级。</p>
+          ) : (
+            <div class="mt-7 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
+              {list.map((cls, i) => <ClassCard cls={cls} class={rotations[i % rotations.length]} />)}
+            </div>
+          )}
+        </section>
+      );
+    })}
+  </div>
+</BaseLayout>

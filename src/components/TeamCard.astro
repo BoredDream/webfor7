@@ -1,0 +1,28 @@
+---
+import type { Member } from '../data/team';
+
+interface Props {
+  member: Member;
+  href?: string;
+  class?: string;
+}
+const { member, href = `/team/${member.id}`, class: cls = '' } = Astro.props;
+const isImage = member.avatar.startsWith('/') || member.avatar.startsWith('http');
+
+// 头像底盘按 id 循环蜡笔色,形成彩色头像墙
+const tints = ['bg-csky-100', 'bg-camber-100', 'bg-cpink-100', 'bg-cgrass-100', 'bg-sun-100'];
+const tint = tints[member.id.charCodeAt(0) % tints.length];
+---
+
+<a href={href} class={`sticker-card group block p-6 text-center h-full ${cls}`}>
+  <div class={`sticker-chip mx-auto mb-4 w-20 h-20 rounded-full ${tint} grid place-items-center overflow-hidden -rotate-2`}>
+    {isImage ? (
+      <img src={member.avatar} alt={member.name} class="w-full h-full object-cover" />
+    ) : (
+      <span class="text-4xl transition-transform duration-300 group-hover:scale-110">{member.avatar}</span>
+    )}
+  </div>
+  <h3 class="font-display text-xl text-ink">{member.name}</h3>
+  <p class="text-sm font-bold text-ink/50 mt-0.5">{member.role}</p>
+  {member.bio && <p class="text-sm font-medium text-ink/60 mt-2 leading-relaxed">{member.bio}</p>}
+</a>

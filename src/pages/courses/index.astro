@@ -1,0 +1,82 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import CourseCard from '../../components/CourseCard.astro';
+import { courses } from '../../data/courses';
+import { catColor } from '../../components/categoryColors';
+
+const categories = ['科学', '人文', '艺术', '素养'] as const;
+const rotations = ['rotate-[0.7deg]', '-rotate-[0.6deg]', 'rotate-[0.4deg]', '-rotate-[0.8deg]'];
+---
+
+<BaseLayout title="课程安排">
+  <PageHeader
+    emoji="🎒"
+    title="特色课程"
+    hl="grass"
+    subtitle="我们为乡村孩子量身设计的课程体系 —— 不只是上课,更是打开一扇看世界的窗。点击任意课程查看详情、课件与科普视频。"
+  />
+
+  <div class="mx-auto max-w-6xl px-4 py-12">
+    <!-- 分类筛选 -->
+    <div class="flex flex-wrap gap-2.5 mb-10" id="catFilter">
+      <button data-cat="all" class="cat-btn active sticker-pill bg-sun-400 text-ink text-sm font-bold cursor-pointer">全部</button>
+      {categories.map((cat) => (
+        <button data-cat={cat} class={`cat-btn sticker-pill bg-card text-sm font-bold cursor-pointer hover:bg-sun-100 ${catColor[cat].text}`}>
+          {cat}类
+        </button>
+      ))}
+    </div>
+
+    <!-- bento 网格:第一门课为横向大卡;筛选时大卡换成同课程普通卡,网格不留洞 -->
+    <div id="courseGrid" class="grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
+      {courses.map((course, i) => (
+        i === 0 ? (
+          <>
+            <div class="course-item feat-full sm:col-span-2" data-category={course.category}>
+              <CourseCard course={course} size="featured" class="-rotate-[0.4deg]" />
+            </div>
+            <div class="course-item feat-compact" data-category={course.category} style="display:none">
+              <CourseCard course={course} class="rotate-[0.5deg]" />
+            </div>
+          </>
+        ) : (
+          <div class="course-item" data-category={course.category}>
+            <CourseCard course={course} class={rotations[i % rotations.length]} />
+          </div>
+        )
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  // 分类筛选:全部时显示横向大卡,筛选时用同课程的普通卡替代
+  const setupCatFilter = () => {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('.cat-btn');
+    const items = document.querySelectorAll<HTMLElement>('.course-item');
+    if (buttons.length === 0) return;
+    const setActive = (btn: Element) => {
+      buttons.forEach((b) => {
+        b.classList.remove('active', 'bg-sun-400');
+        b.classList.add('bg-card');
+      });
+      btn.classList.add('active', 'bg-sun-400');
+      btn.classList.remove('bg-card');
+    };
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const cat = btn.dataset.cat!;
+        setActive(btn);
+        items.forEach((item) => {
+          let show = cat === 'all' || item.dataset.category === cat;
+          if (item.classList.contains('feat-full') && cat !== 'all') show = false;
+          if (item.classList.contains('feat-compact') && cat === 'all') show = false;
+          item.style.display = show ? '' : 'none';
+        });
+      });
+    });
+  };
+  setupCatFilter();
+  document.addEventListener('astro:page-load', setupCatFilter);
+</script>

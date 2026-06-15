@@ -1,0 +1,19 @@
+---
+// 画本风分节标题:手写体 + 蜡笔高亮笔触 + 可选 emoji / 描述
+interface Props {
+  title: string;
+  emoji?: string;
+  /** 高亮笔触颜色 */
+  hl?: 'sun' | 'grass' | 'sky' | 'pink';
+  desc?: string;
+}
+const { title, emoji, hl = 'sun', desc } = Astro.props;
+---
+
+<div>
+  <h2 class="font-display text-2xl md:text-3xl text-ink">
+    <span class={`hl-${hl}`}>{title}</span>
+    {emoji && <span class="ml-1">{emoji}</span>}
+  </h2>
+  {desc && <p class="mt-2 text-ink/60 font-medium">{desc}</p>}
+</div>

@@ -1,0 +1,70 @@
+---
+import { site, nav } from '../data/site';
+const path = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === '/' ? path === '/' : path.startsWith(href);
+---
+
+<header class="sticky top-0 z-50 paper-bg border-b-2 border-ink/15">
+  <nav class="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between gap-4">
+    <a href="/" class="flex items-center gap-2 font-display text-xl text-ink shrink-0">
+      <span class="sticker-chip grid h-9 w-9 place-items-center rounded-xl bg-sun-400 text-lg -rotate-6">☀️</span>
+      <span>{site.name}</span>
+    </a>
+
+    <!-- 桌面导航 -->
+    <ul class="hidden md:flex items-center gap-2 text-sm font-bold">
+      {nav.map((item) => (
+        <li>
+          <a
+            href={item.href}
+            class={
+              isActive(item.href)
+                ? 'sticker-pill inline-block bg-sun-400 text-ink'
+                : 'sticker-pill-ghost inline-block text-ink/70 hover:text-ink'
+            }
+          >
+            {item.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <!-- 移动端菜单按钮 -->
+    <button
+      id="navToggle"
+      class="md:hidden p-2 rounded-xl border-2 border-ink/20 text-ink hover:bg-sun-100"
+      aria-label="打开菜单"
+    >
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <line x1="4" y1="7" x2="20" y2="7" /><line x1="4" y1="12" x2="20" y2="12" /><line x1="4" y1="17" x2="20" y2="17" />
+      </svg>
+    </button>
+  </nav>
+
+  <!-- 移动端下拉 -->
+  <ul id="mobileMenu" class="hidden md:hidden border-t-2 border-dashed border-ink/15 paper-bg px-4 py-2">
+    {nav.map((item) => (
+      <li>
+        <a
+          href={item.href}
+          class={`block px-3 py-3 rounded-xl font-bold ${
+            isActive(item.href) ? 'bg-sun-200/60 text-ink' : 'text-ink/70'
+          }`}
+        >
+          {item.label}
+        </a>
+      </li>
+    ))}
+  </ul>
+</header>
+
+<script>
+  const setup = () => {
+    const btn = document.getElementById('navToggle');
+    const menu = document.getElementById('mobileMenu');
+    btn?.addEventListener('click', () => menu?.classList.toggle('hidden'));
+  };
+  setup();
+  document.addEventListener('astro:page-load', setup);
+</script>

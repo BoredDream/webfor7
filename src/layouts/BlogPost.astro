@@ -1,0 +1,41 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import BackLink from '../components/BackLink.astro';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props { post: CollectionEntry<'blog'> }
+const { post } = Astro.props;
+const { title, date, summary, cover, tags, author } = post.data;
+const dateStr = date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+---
+
+<BaseLayout title={title} description={summary}>
+  <article class="mx-auto max-w-3xl px-4 py-12">
+    <BackLink fallback="/" label="返回报道" />
+
+    <header class="mt-6 mb-9">
+      <div class="flex flex-wrap gap-2 mb-5">
+        {tags.map((t) => (
+          <span class="rounded-full border-2 border-ink/15 bg-card px-2.5 py-0.5 text-xs font-bold text-ink/70">#{t}</span>
+        ))}
+      </div>
+      <h1 class="font-display text-3xl md:text-4xl text-ink leading-snug">{title}</h1>
+      <div class="mt-4 text-sm font-bold text-ink/45 flex items-center gap-3">
+        {author && <span>✏️ {author}</span>}
+        <time datetime={date.toISOString()}>{dateStr}</time>
+      </div>
+      <div class="mt-6 h-1 w-24 rounded-full bg-sun-400" aria-hidden="true"></div>
+    </header>
+
+    {cover && (
+      <div class="sticker-card overflow-hidden mb-9 -rotate-[0.4deg]">
+        <span class="tape" aria-hidden="true"></span>
+        <img src={cover} alt={title} class="w-full" />
+      </div>
+    )}
+
+    <div class="prose-body">
+      <slot />
+    </div>
+  </article>
+</BaseLayout>

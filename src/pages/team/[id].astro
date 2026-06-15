@@ -1,0 +1,78 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BackLink from '../../components/BackLink.astro';
+import CourseCard from '../../components/CourseCard.astro';
+import ClassCard from '../../components/ClassCard.astro';
+import SectionTitle from '../../components/SectionTitle.astro';
+import { members } from '../../data/team';
+import { courses } from '../../data/courses';
+import { classes } from '../../data/classes';
+
+export async function getStaticPaths() {
+  return members.map((member) => ({ params: { id: member.id }, props: { member } }));
+}
+
+const { member } = Astro.props;
+const teaches = courses.filter((c) => c.teacherId === member.id);
+const heads = classes.filter((c) => c.headTeacherId === member.id);
+const isImage = member.avatar.startsWith('/') || member.avatar.startsWith('http');
+
+const tints = ['bg-csky-100', 'bg-camber-100', 'bg-cpink-100', 'bg-cgrass-100', 'bg-sun-100'];
+const tint = tints[member.id.charCodeAt(0) % tints.length];
+---
+
+<BaseLayout title={member.name} description={member.bio}>
+  <div class="mx-auto max-w-3xl px-4 py-12">
+    <BackLink fallback="/team" label="返回人员" />
+
+    <header class="mt-6 mb-9 flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left">
+      <div class={`sticker-chip w-28 h-28 rounded-full ${tint} grid place-items-center overflow-hidden -rotate-3 shrink-0`}>
+        {isImage ? (
+          <img src={member.avatar} alt={member.name} class="w-full h-full rounded-full object-cover" />
+        ) : (
+          <span class="text-6xl">{member.avatar}</span>
+        )}
+      </div>
+      <div>
+        <h1 class="font-display text-3xl md:text-4xl text-ink">
+          <span class="hl-sun">{member.name}</span>
+        </h1>
+        <p class="text-ink/55 font-bold mt-2">{member.role}</p>
+        {member.subjects && (
+          <div class="flex flex-wrap gap-2 mt-3 justify-center sm:justify-start">
+            {member.subjects.map((s) => (
+              <span class="rounded-full bg-sun-200/70 px-2.5 py-1 text-xs font-bold text-ink">{s}</span>
+            ))}
+          </div>
+        )}
+      </div>
+    </header>
+
+    <section class="sticker-card p-7 -rotate-[0.3deg] space-y-3 text-ink/75 leading-relaxed font-medium">
+      <span class="tape" aria-hidden="true"></span>
+      {member.intro.map((p) => <p>{p}</p>)}
+    </section>
+
+    {teaches.length > 0 && (
+      <section class="mt-12">
+        <SectionTitle title={`${member.name} 的课程`} emoji="🎒" hl="grass" />
+        <div class="mt-6 grid gap-7 sm:grid-cols-2">
+          {teaches.map((c, i) => (
+            <CourseCard course={c} class={i % 2 ? '-rotate-[0.5deg]' : 'rotate-[0.5deg]'} />
+          ))}
+        </div>
+      </section>
+    )}
+
+    {heads.length > 0 && (
+      <section class="mt-12">
+        <SectionTitle title={`${member.name} 带的班`} emoji="🏫" hl="sky" />
+        <div class="mt-6 grid gap-7 sm:grid-cols-2">
+          {heads.map((c, i) => (
+            <ClassCard cls={c} class={i % 2 ? '-rotate-[0.5deg]' : 'rotate-[0.5deg]'} />
+          ))}
+        </div>
+      </section>
+    )}
+  </div>
+</BaseLayout>

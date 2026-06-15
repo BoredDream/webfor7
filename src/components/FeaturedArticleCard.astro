@@ -1,0 +1,40 @@
+---
+// 特色报道大卡:首页报道区第一篇(最新)文章的全宽横向卡
+import type { CollectionEntry } from 'astro:content';
+interface Props { post: CollectionEntry<'blog'> }
+const { post } = Astro.props;
+const { title, date, summary, cover, tags, author } = post.data;
+const dateStr = date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+
+const placeholders = [
+  { bg: 'bg-csky-100', emoji: '📰' },
+  { bg: 'bg-camber-100', emoji: '🖍️' },
+  { bg: 'bg-cpink-100', emoji: '📮' },
+  { bg: 'bg-cgrass-100', emoji: '🌱' },
+];
+const ph = placeholders[title.length % placeholders.length];
+---
+
+<a href={`/blog/${post.id}`} class="sticker-card group grid sm:grid-cols-5 overflow-hidden -rotate-[0.5deg] h-full">
+  <span class="tape" aria-hidden="true"></span>
+  <div class={`sm:col-span-2 relative min-h-44 border-b-2 sm:border-b-0 sm:border-r-2 border-ink/15 overflow-hidden ${cover ? '' : ph.bg}`}>
+    {cover ? (
+      <img src={cover} alt={title} class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+    ) : (
+      <span class="absolute inset-0 grid place-items-center text-6xl transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">{ph.emoji}</span>
+    )}
+    <span class="sticker-chip absolute left-4 top-4 rounded-lg bg-sun-400 px-2.5 py-1 text-xs font-bold text-ink -rotate-3">最新!</span>
+  </div>
+  <div class="sm:col-span-3 p-7 flex flex-col">
+    <div class="flex flex-wrap gap-2">
+      {tags.map((t) => (
+        <span class="rounded-full border-2 border-ink/15 bg-card px-2.5 py-0.5 text-xs font-bold text-ink/70">#{t}</span>
+      ))}
+    </div>
+    <h3 class="mt-3 font-display text-2xl text-ink leading-snug">{title}</h3>
+    <p class="mt-3 text-ink/65 font-medium leading-relaxed">{summary}</p>
+    <p class="mt-auto pt-4 text-sm font-bold text-ink/45">
+      {author ? `✏️ ${author} · ` : ''}{dateStr}
+    </p>
+  </div>
+</a>
