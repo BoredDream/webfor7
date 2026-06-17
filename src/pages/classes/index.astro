@@ -1,70 +1,47 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import SectionTitle from '../../components/SectionTitle.astro';
 import ClassCard from '../../components/ClassCard.astro';
 import { classes } from '../../data/classes';
 
 const studentTotal = classes.reduce((sum, cls) => sum + cls.students.length, 0);
 const courseTotal = classes.reduce((sum, cls) => sum + cls.timetable.length, 0);
+
+const statItems = [
+  { num: classes.length, label: '个班级', emoji: '🏫' },
+  { num: studentTotal, label: '名学生', emoji: '🧒' },
+  { num: courseTotal, label: '节课程', emoji: '📚' },
+];
+const rotations = ['-rotate-1', 'rotate-1', '-rotate-[0.5deg]'];
 ---
 
 <BaseLayout title="班级">
-  <section class="relative overflow-hidden border-b-2 border-ink/10 bg-[#e7eee8]">
-    <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,246,227,0.1),rgba(255,246,227,0.86)),radial-gradient(circle_at_20%_10%,rgba(255,255,255,0.45),transparent_32%)]"></div>
-    <div class="mx-auto grid max-w-6xl gap-8 px-4 py-10 md:grid-cols-[0.95fr_1.25fr] md:items-center md:py-14">
-      <div class="relative z-10">
-        <span class="inline-flex rounded-full border border-ink/15 bg-card/80 px-3 py-1 text-xs font-bold text-ink/60 shadow-sm">班级设置</span>
-        <h1 class="mt-4 font-display text-4xl leading-tight text-ink md:text-5xl">按年龄分班,把课堂带到孩子身边</h1>
-        <p class="mt-5 max-w-xl text-base font-medium leading-relaxed text-ink/68">
-          目前设置两个班级:3-6 岁和 6-12 岁。每个班级对应不同的学习节奏、课程安排和带班老师,方便支教队按年龄组织课堂。
-        </p>
-        <div class="mt-7 grid max-w-md grid-cols-3 overflow-hidden rounded-2xl border-2 border-ink/65 bg-card shadow-[4px_5px_0_rgba(61,44,30,0.12)]">
-          <div class="border-r border-ink/10 px-4 py-3">
-            <p class="font-display text-2xl text-ink">{classes.length}</p>
-            <p class="mt-1 text-xs font-bold text-ink/48">个班级</p>
-          </div>
-          <div class="border-r border-ink/10 px-4 py-3">
-            <p class="font-display text-2xl text-ink">{studentTotal}</p>
-            <p class="mt-1 text-xs font-bold text-ink/48">名学生</p>
-          </div>
-          <div class="px-4 py-3">
-            <p class="font-display text-2xl text-ink">{courseTotal}</p>
-            <p class="mt-1 text-xs font-bold text-ink/48">节课程</p>
-          </div>
+  <PageHeader
+    emoji="🏫"
+    title="班级"
+    hl="grass"
+    subtitle="目前设置 3-6 岁和 6-12 岁两个班级,每个班对应不同的学习节奏、课程安排和带班老师。点击班级即可查看一日课表与学生档案。"
+  />
+
+  <div class="mx-auto max-w-6xl px-4 py-12 md:py-14">
+    <!-- 数据条 -->
+    <div class="mb-11 grid grid-cols-3 gap-4 sm:max-w-xl">
+      {statItems.map((s, i) => (
+        <div class={`sticker-card p-4 text-center ${rotations[i]}`}>
+          <div class="text-2xl">{s.emoji}</div>
+          <p class="mt-1 font-display text-3xl text-ink">{s.num}</p>
+          <p class="mt-0.5 text-xs font-bold text-ink/45">{s.label}</p>
         </div>
-      </div>
-
-      <div class="relative z-10">
-        <div class="overflow-hidden rounded-[1.5rem] border-2 border-ink/70 bg-card p-2 shadow-[6px_8px_0_rgba(61,44,30,0.16)]">
-          <div class="relative aspect-[16/9] overflow-hidden rounded-[1rem] bg-[#d8e1d9]">
-            <div class="absolute inset-0 bg-[linear-gradient(180deg,#d7e5e1_0%,#eef0e5_48%,#b9c9b7_49%,#aebda8_100%)]"></div>
-            <div class="absolute left-[7%] top-[13%] h-[48%] w-[50%] rounded-sm border-[7px] border-[#68786f] bg-[#24372e] shadow-[0_12px_24px_rgba(36,30,24,0.2)]"></div>
-            <div class="absolute left-[11%] top-[24%] h-1.5 w-[32%] rounded-full bg-white/55"></div>
-            <div class="absolute left-[11%] top-[34%] h-1.5 w-[24%] rounded-full bg-white/38"></div>
-            <div class="absolute left-[11%] top-[44%] h-1.5 w-[36%] rounded-full bg-white/30"></div>
-            <div class="absolute bottom-[10%] right-[9%] flex items-end gap-3 opacity-80">
-              <span class="h-24 w-14 rounded-t-full bg-[#8c6f55]/55"></span>
-              <span class="h-20 w-12 rounded-t-full bg-[#6f8a73]/55"></span>
-              <span class="h-16 w-10 rounded-t-full bg-[#b39b6d]/55"></span>
-            </div>
-            <div class="absolute bottom-0 left-0 right-0 h-[18%] bg-[#756955]/24"></div>
-            <div class="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.2),transparent_42%),radial-gradient(circle_at_34%_18%,rgba(255,255,255,0.42),transparent_28%)]"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="mx-auto max-w-6xl px-4 py-12 md:py-14">
-    <div class="mb-7 flex flex-wrap items-end justify-between gap-4">
-      <div>
-        <p class="text-xs font-bold uppercase tracking-[0.18em] text-ink/35">Classes</p>
-        <h2 class="mt-2 font-display text-3xl text-ink">选择班级</h2>
-      </div>
-      <p class="max-w-md text-sm font-medium leading-relaxed text-ink/55">点击进入后可以查看带班老师、一日课表和学生档案整理进度。</p>
+      ))}
     </div>
 
-    <div class="grid gap-7 md:grid-cols-2">
-      {classes.map((cls) => <ClassCard cls={cls} />)}
+    <SectionTitle title="选择班级" emoji="🎒" desc="点击进入查看带班老师、一日课表和学生档案整理进度。" />
+
+    <div class="mt-7 grid gap-7 md:grid-cols-2">
+      {classes.map((cls, i) => (
+        <ClassCard cls={cls} class={i % 2 === 0 ? 'rotate-[0.4deg]' : '-rotate-[0.5deg]'} />
+      ))}
     </div>
-  </section>
+  </div>
 </BaseLayout>
