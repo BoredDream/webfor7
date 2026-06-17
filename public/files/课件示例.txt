@@ -4,4 +4,4 @@
 然后在 src/data/courses.ts 中,把对应课程的 coursewareUrl 改成该文件路径,例如:
   coursewareUrl: '/files/趣味科学课-第1讲.pdf'
 
-—— 萤火支教
+—— 暖阳

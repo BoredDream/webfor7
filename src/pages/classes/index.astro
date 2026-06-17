@@ -1,38 +1,47 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHeader from '../../components/PageHeader.astro';
-import ClassCard from '../../components/ClassCard.astro';
 import SectionTitle from '../../components/SectionTitle.astro';
-import { ageGroups, classesByGroup } from '../../data/classes';
+import ClassCard from '../../components/ClassCard.astro';
+import { classes } from '../../data/classes';
 
-const hls = ['sun', 'grass', 'sky'] as const;
-const rotations = ['rotate-[0.6deg]', '-rotate-[0.7deg]', 'rotate-[0.4deg]'];
+const studentTotal = classes.reduce((sum, cls) => sum + cls.students.length, 0);
+const courseTotal = classes.reduce((sum, cls) => sum + cls.timetable.length, 0);
+
+const statItems = [
+  { num: classes.length, label: '个班级', emoji: '🏫' },
+  { num: studentTotal, label: '名学生', emoji: '🧒' },
+  { num: courseTotal, label: '节课程', emoji: '📚' },
+];
+const rotations = ['-rotate-1', 'rotate-1', '-rotate-[0.5deg]'];
 ---
 
 <BaseLayout title="班级">
   <PageHeader
     emoji="🏫"
     title="班级"
-    hl="sky"
-    subtitle="我们按年龄把孩子分成不同班级,每个班级都有专属的带班老师、课表与学生。点击班级了解详情。"
+    hl="grass"
+    subtitle="目前设置 3-6 岁和 6-12 岁两个班级,每个班对应不同的学习节奏、课程安排和带班老师。点击班级即可查看一日课表与学生档案。"
   />
 
-  <div class="mx-auto max-w-6xl px-4 py-12 space-y-14">
-    {ageGroups.map((group, gi) => {
-      const list = classesByGroup(group.id);
-      return (
-        <section>
-          <SectionTitle title={`${group.emoji} ${group.label}`} hl={hls[gi % hls.length]} desc={group.desc} />
+  <div class="mx-auto max-w-6xl px-4 py-12 md:py-14">
+    <!-- 数据条 -->
+    <div class="mb-11 grid grid-cols-3 gap-4 sm:max-w-xl">
+      {statItems.map((s, i) => (
+        <div class={`sticker-card p-4 text-center ${rotations[i]}`}>
+          <div class="text-2xl">{s.emoji}</div>
+          <p class="mt-1 font-display text-3xl text-ink">{s.num}</p>
+          <p class="mt-0.5 text-xs font-bold text-ink/45">{s.label}</p>
+        </div>
+      ))}
+    </div>
 
-          {list.length === 0 ? (
-            <p class="mt-6 text-sm font-medium text-ink/40">该年龄段暂未设置班级。</p>
-          ) : (
-            <div class="mt-7 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
-              {list.map((cls, i) => <ClassCard cls={cls} class={rotations[i % rotations.length]} />)}
-            </div>
-          )}
-        </section>
-      );
-    })}
+    <SectionTitle title="选择班级" emoji="🎒" desc="点击进入查看带班老师、一日课表和学生档案整理进度。" />
+
+    <div class="mt-7 grid gap-7 md:grid-cols-2">
+      {classes.map((cls, i) => (
+        <ClassCard cls={cls} class={i % 2 === 0 ? 'rotate-[0.4deg]' : '-rotate-[0.5deg]'} />
+      ))}
+    </div>
   </div>
 </BaseLayout>
