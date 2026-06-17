@@ -2,6 +2,7 @@
 title: "我们为什么要去支教?"
 date: 2026-05-20
 summary: "支教不是'我去帮助你',而是'我们一起看见更大的世界'。这是出发前我们想清楚的一件事。"
+cover: /images/blog/origin.svg
 tags: ["项目缘起", "随笔"]
 author: "林晓"
 draft: false

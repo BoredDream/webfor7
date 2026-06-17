@@ -2,6 +2,7 @@
 title: "我们的第一堂科学课:一个鸡蛋讲清浮力"
 date: 2026-06-10
 summary: "没有实验室,我们用一杯盐水和一个鸡蛋,让孩子第一次亲眼看见'浮力'。"
+cover: /images/blog/science.svg
 tags: ["教学日记", "科学"]
 author: "陈宇"
 draft: false

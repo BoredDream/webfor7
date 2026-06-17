@@ -14,7 +14,7 @@ export const site = {
 export const stats: { label: string; value: string; suffix?: string; href?: string }[] = [
   { label: '覆盖年级', value: '2', suffix: '个年级' },
   { label: '受益学生', value: '80', suffix: '名' },
-  { label: '课时', value: '80', suffix: '节', href: '/classes/sunflower#timetable' },
+  { label: '课时', value: '80', suffix: '节', href: '/timetable' },
   { label: '志愿者', value: '14', suffix: '名' },
 ];
 
@@ -22,6 +22,7 @@ export const stats: { label: string; value: string; suffix?: string; href?: stri
 export const nav: { label: string; href: string }[] = [
   { label: '报道', href: '/' },
   { label: '课程安排', href: '/courses' },
+  { label: '课表', href: '/timetable' },
   { label: '班级', href: '/classes' },
   { label: '人员', href: '/team' },
 ];

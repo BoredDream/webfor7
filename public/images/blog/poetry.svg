@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500" role="img" aria-label="诗词鉴赏">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff6e6"/>
+      <stop offset="100%" stop-color="#ffffff"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#sky)"/>
+  <!-- 太阳 -->
+  <circle cx="660" cy="120" r="46" fill="#ffd98f"/>
+  <circle cx="660" cy="120" r="62" fill="none" stroke="#ffd98f" stroke-width="3" stroke-dasharray="3 13" opacity="0.7"/>
+  <!-- 云 -->
+  <g fill="#ffffff" opacity="0.85">
+    <ellipse cx="170" cy="110" rx="52" ry="22"/>
+    <ellipse cx="210" cy="98" rx="38" ry="20"/>
+    <ellipse cx="130" cy="100" rx="30" ry="16"/>
+  </g>
+  <!-- 远山 -->
+  <path d="M0,430 C160,360 300,400 440,360 C560,326 700,366 800,338 L800,500 L0,500 Z" fill="#ffe7bd"/>
+  <!-- 近山 -->
+  <path d="M0,470 C180,410 320,452 470,420 C620,390 720,428 800,406 L800,500 L0,500 Z" fill="#bfe0a0"/>
+  <path d="M0,470 C180,410 320,452 470,420 C620,390 720,428 800,406" fill="none" stroke="#a9d188" stroke-width="3" opacity="0.6"/>
+  <!-- 小树 -->
+  <g font-size="30">
+    <text x="120" y="452">🌳</text><text x="370" y="438">🌲</text><text x="600" y="432">🌳</text>
+  </g>
+  <!-- 主图 -->
+  <text x="400" y="300" font-size="150" text-anchor="middle" dominant-baseline="middle">📜</text>
+  <!-- 标签 -->
+  <g>
+    <rect x="328" y="346" width="144" height="40" rx="20" fill="#ffffff" stroke="#ececec"/>
+    <text x="400" y="372" font-size="20" text-anchor="middle" fill="#5b5246" font-family="Songti SC, serif" font-weight="700">诗词鉴赏</text>
+  </g>
+</svg>

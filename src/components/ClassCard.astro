@@ -1,6 +1,6 @@
 ---
-// 班级入口卡:暖色班级横幅 + 黑板牌 + 带班老师头像 + 一日课程色块。
-// 有真实照片(coverImage)时优先用照片,否则用暖色插画横幅。
+// 班级入口卡(白色精致风):柔和横幅 + 黑板牌 + 带班老师 + 一日课程色块。
+// 有真实照片(coverImage)时优先用照片,否则用柔和插画横幅。
 import type { SchoolClass } from '../data/classes';
 import { ageGroups } from '../data/classes';
 import { getCourse } from '../data/courses';
@@ -15,73 +15,70 @@ const { cls, class: clsName = '' } = Astro.props;
 const head = getMember(cls.headTeacherId);
 const group = ageGroups.find((g) => g.id === cls.ageGroupId);
 
-// 按年龄段给横幅一套暖色调与装饰
+// 按年龄段给横幅一套柔和色调与装饰
 const young = cls.ageGroupId === 'age-3-6';
 const bannerGrad = young
-  ? 'bg-[linear-gradient(135deg,#ffe6c7_0%,#ffd0a1_100%)]'
-  : 'bg-[linear-gradient(135deg,#d8efd1_0%,#abd89c_100%)]';
+  ? 'bg-[linear-gradient(135deg,#fff0db_0%,#ffe1bd_100%)]'
+  : 'bg-[linear-gradient(135deg,#e7f5dd_0%,#cfead9_100%)]';
 const decor = young ? ['🌈', '⭐', '🪁'] : ['🌿', '📚', '🔭'];
 ---
 
-<a
-  href={`/classes/${cls.id}`}
-  class={`group block overflow-hidden rounded-[1.25rem] border-2 border-ink/75 bg-card shadow-[5px_6px_0_rgba(61,44,30,0.16)] transition duration-200 hover:-translate-y-1 hover:shadow-[7px_9px_0_rgba(61,44,30,0.2)] ${clsName}`}
->
+<a href={`/classes/${cls.id}`} class={`sticker-card group block overflow-hidden ${clsName}`}>
   <!-- 横幅 -->
-  <div class={`relative h-36 overflow-hidden border-b-2 border-ink/60 ${cls.coverImage ? '' : bannerGrad}`}>
+  <div class={`relative h-40 overflow-hidden border-b border-line ${cls.coverImage ? '' : bannerGrad}`}>
     {cls.coverImage ? (
       <img
         src={cls.coverImage}
         alt={`${cls.name}课堂照片`}
-        class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+        class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
         loading="lazy"
       />
     ) : (
       <>
-        <span class="absolute left-3 top-3 text-xl opacity-70">{decor[0]}</span>
-        <span class="absolute right-4 top-3 text-lg opacity-60">{decor[1]}</span>
-        <span class="absolute right-4 bottom-3 text-lg opacity-55">{decor[2]}</span>
+        <span class="absolute left-4 top-3 text-xl opacity-70">{decor[0]}</span>
+        <span class="absolute right-5 top-3 text-lg opacity-60">{decor[1]}</span>
+        <span class="absolute right-5 bottom-3 text-lg opacity-55">{decor[2]}</span>
         <!-- 黑板小牌 -->
         <div class="absolute inset-0 grid place-items-center">
-          <div class="-rotate-1 rounded-lg border-2 border-[#2c4332] bg-[#33503a] px-6 py-2.5 text-center shadow-[0_5px_12px_rgba(36,30,24,0.2)]">
-            <p class="font-display text-xl leading-tight text-[#eef6ee] drop-shadow-sm">{cls.name}</p>
-            <span class="mx-auto mt-1.5 block h-0.5 w-12 rounded bg-white/45"></span>
+          <div class="rounded-xl border-2 border-[#3a5340] bg-[#3a5a40] px-7 py-3 text-center shadow-[0_8px_20px_rgba(36,30,24,0.18)]">
+            <p class="font-display text-xl leading-tight text-[#eef6ee]">{cls.name}</p>
+            <span class="mx-auto mt-1.5 block h-0.5 w-12 rounded bg-white/40"></span>
           </div>
         </div>
-        <span class="absolute bottom-3 left-3 inline-flex items-center gap-1 rounded-full bg-card/90 px-2.5 py-1 text-xs font-bold text-ink shadow-sm">
+        <span class="absolute bottom-3 left-4 inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-ink shadow-sm backdrop-blur">
           {group?.emoji} {group?.label}
         </span>
       </>
     )}
     {cls.coverImage && (
-      <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/65 to-transparent px-5 pb-4 pt-12">
-        <span class="inline-flex rounded-full bg-card/95 px-3 py-1 text-xs font-bold text-ink shadow-sm">{group?.label}</span>
+      <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/55 to-transparent px-5 pb-4 pt-12">
+        <span class="inline-flex rounded-full bg-white/95 px-3 py-1 text-xs font-bold text-ink shadow-sm">{group?.label}</span>
         <h3 class="mt-2 font-display text-2xl text-white drop-shadow-sm">{cls.name}</h3>
       </div>
     )}
   </div>
 
   <!-- 正文 -->
-  <div class="p-5 md:p-6">
-    <p class="min-h-[3.25rem] text-sm font-medium leading-relaxed text-ink/68">{cls.summary}</p>
+  <div class="p-6">
+    <p class="min-h-[3.25rem] text-sm leading-relaxed text-ink/60">{cls.summary}</p>
 
     <!-- 带班老师 + 关键数据 -->
     <div class="mt-4 flex items-center gap-3">
-      <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full border-2 border-ink/75 bg-sun-200 text-lg shadow-[2px_2px_0_rgba(61,44,30,0.16)]">
+      <span class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-sun-100 text-lg ring-1 ring-line">
         {head?.avatar ?? '🧑‍🏫'}
       </span>
       <div class="min-w-0">
         <p class="truncate text-sm font-bold leading-tight text-ink">{head?.name ?? '待定'}</p>
-        <p class="text-xs text-ink/45">带班老师</p>
+        <p class="text-xs text-ink/40">带班老师</p>
       </div>
-      <div class="ml-auto flex shrink-0 gap-2 text-xs font-bold text-ink/58">
-        <span class="rounded-full bg-grass-200/70 px-2.5 py-1">👦 {cls.students.length}</span>
-        <span class="rounded-full bg-csky-100 px-2.5 py-1">📅 {cls.timetable.length} 节</span>
+      <div class="ml-auto flex shrink-0 gap-2 text-xs font-bold text-ink/55">
+        <span class="rounded-full bg-cgrass-100 px-2.5 py-1 text-cgrass-700">👦 {cls.students.length}</span>
+        <span class="rounded-full bg-csky-100 px-2.5 py-1 text-csky-700">📅 {cls.timetable.length} 节</span>
       </div>
     </div>
 
     <!-- 一日课程 -->
-    <div class="mt-4 border-t-2 border-dashed border-ink/12 pt-3.5">
+    <div class="mt-4 border-t border-line pt-4">
       <p class="mb-2 text-xs font-bold text-ink/40">一日课程</p>
       <div class="flex flex-wrap gap-2">
         {cls.timetable.map((t) => {
@@ -89,7 +86,7 @@ const decor = young ? ['🌈', '⭐', '🪁'] : ['🌿', '📚', '🔭'];
           const color = course ? catColor[course.category] : catColor['素养'];
           return (
             <span
-              class={`rounded-full px-3 py-1 text-xs font-bold ${color.chip}`}
+              class={`rounded-full px-3 py-1 text-xs font-semibold ${color.chip}`}
               title={`${t.time} ${course?.title ?? t.courseId}`}
             >
               {course?.title ?? t.courseId}

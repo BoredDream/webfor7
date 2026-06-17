@@ -13,7 +13,6 @@ const statItems = [
   { num: studentTotal, label: '名学生', emoji: '🧒' },
   { num: courseTotal, label: '节课程', emoji: '📚' },
 ];
-const rotations = ['-rotate-1', 'rotate-1', '-rotate-[0.5deg]'];
 ---
 
 <BaseLayout title="班级">
@@ -26,21 +25,30 @@ const rotations = ['-rotate-1', 'rotate-1', '-rotate-[0.5deg]'];
 
   <div class="mx-auto max-w-6xl px-4 py-12 md:py-14">
     <!-- 数据条 -->
-    <div class="mb-11 grid grid-cols-3 gap-4 sm:max-w-xl">
-      {statItems.map((s, i) => (
-        <div class={`sticker-card p-4 text-center ${rotations[i]}`}>
-          <div class="text-2xl">{s.emoji}</div>
-          <p class="mt-1 font-display text-3xl text-ink">{s.num}</p>
-          <p class="mt-0.5 text-xs font-bold text-ink/45">{s.label}</p>
-        </div>
-      ))}
+    <div class="mb-11 flex flex-wrap items-stretch gap-4">
+      <div class="grid flex-1 grid-cols-3 gap-4 sm:max-w-xl">
+        {statItems.map((s) => (
+          <div class="sticker-card p-4 text-center">
+            <div class="text-2xl">{s.emoji}</div>
+            <p class="mt-1 font-display text-3xl font-bold text-ink">{s.num}</p>
+            <p class="mt-0.5 text-xs font-bold text-ink/45">{s.label}</p>
+          </div>
+        ))}
+      </div>
+      <a href="/timetable" class="sticker-card group flex items-center gap-3 bg-sun-400 px-6 py-4" style="border-color:transparent">
+        <span class="text-2xl">📅</span>
+        <span>
+          <span class="block font-display text-lg font-bold text-ink leading-tight">查看完整课表</span>
+          <span class="text-xs font-bold text-ink/60 group-hover:translate-x-0.5 inline-block transition-transform">两周营期安排 →</span>
+        </span>
+      </a>
     </div>
 
     <SectionTitle title="选择班级" emoji="🎒" desc="点击进入查看带班老师、一日课表和学生档案整理进度。" />
 
     <div class="mt-7 grid gap-7 md:grid-cols-2">
-      {classes.map((cls, i) => (
-        <ClassCard cls={cls} class={i % 2 === 0 ? 'rotate-[0.4deg]' : '-rotate-[0.5deg]'} />
+      {classes.map((cls) => (
+        <ClassCard cls={cls} />
       ))}
     </div>
   </div>

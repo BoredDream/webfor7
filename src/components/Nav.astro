@@ -5,7 +5,7 @@ const isActive = (href: string) =>
   href === '/' ? path === '/' : path.startsWith(href);
 ---
 
-<header class="sticky top-0 z-50 paper-bg border-b-2 border-ink/15">
+<header class="sticky top-0 z-50 bg-white/85 backdrop-blur-md border-b border-line">
   <nav class="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between gap-4">
     <a href="/" class="flex items-center gap-2 font-display text-xl text-ink shrink-0">
       <span class="sticker-chip grid h-9 w-9 place-items-center rounded-xl bg-sun-400 text-lg -rotate-6">☀️</span>
@@ -43,7 +43,7 @@ const isActive = (href: string) =>
   </nav>
 
   <!-- 移动端下拉 -->
-  <ul id="mobileMenu" class="hidden md:hidden border-t-2 border-dashed border-ink/15 paper-bg px-4 py-2">
+  <ul id="mobileMenu" class="hidden md:hidden border-t border-line bg-white px-4 py-2">
     {nav.map((item) => (
       <li>
         <a

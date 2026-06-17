@@ -1,0 +1,169 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import { weeks, ttClasses, dayNames, getDates, timetable, ttCategory } from '../data/timetable';
+import type { TTCategory } from '../data/timetable';
+
+// 分类 → 色块样式
+const catStyle: Record<TTCategory, { cell: string; dot: string; label: string }> = {
+  科学: { cell: 'bg-csky-100 text-csky-700', dot: 'bg-csky-300', label: '科学' },
+  人文: { cell: 'bg-camber-100 text-camber-700', dot: 'bg-camber-300', label: '人文' },
+  艺术: { cell: 'bg-cpink-100 text-cpink-700', dot: 'bg-cpink-300', label: '艺术' },
+  素养: { cell: 'bg-cgrass-100 text-cgrass-700', dot: 'bg-cgrass-300', label: '素养' },
+  作息: { cell: 'bg-gray-50 text-gray-400', dot: 'bg-gray-200', label: '生活作息' },
+};
+const legend: TTCategory[] = ['科学', '人文', '艺术', '素养', '作息'];
+---
+
+<BaseLayout title="营期课表">
+  <PageHeader
+    emoji="📅"
+    title="营期课表"
+    hl="sun"
+    subtitle="两周营期、两个班级的完整作息与课程安排。先选择班级，再选择周次，即可查看对应的一周课表。"
+  />
+
+  <div class="mx-auto max-w-6xl px-4 py-10 md:py-14">
+    <!-- 索引一:班级 -->
+    <div class="mb-5">
+      <p class="mb-2.5 text-xs font-bold tracking-widest text-ink/40">选择班级</p>
+      <div class="flex flex-wrap gap-2.5" id="classTabs">
+        {ttClasses.map((c, i) => (
+          <button
+            data-class={c.id}
+            class={`tt-class sticker-pill cursor-pointer text-sm font-bold ${i === 0 ? 'active bg-sun-400 text-ink' : 'bg-card text-ink/65'}`}
+          >
+            {c.label}<span class="ml-1.5 hidden font-normal text-ink/40 sm:inline">· {c.note}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+
+    <!-- 索引二:周次 -->
+    <div class="mb-7">
+      <p class="mb-2.5 text-xs font-bold tracking-widest text-ink/40">选择周次</p>
+      <div class="flex flex-wrap gap-2.5" id="weekTabs">
+        {weeks.map((w, i) => (
+          <button
+            data-week={w.id}
+            class={`tt-week sticker-pill cursor-pointer text-sm font-bold ${i === 0 ? 'active bg-grass-400 text-ink' : 'bg-card text-ink/65'}`}
+          >
+            {w.label}<span class="ml-1.5 hidden font-normal text-ink/40 sm:inline">· {w.range}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+
+    <!-- 图例 -->
+    <div class="mb-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-bold text-ink/55">
+      {legend.map((c) => (
+        <span class="inline-flex items-center gap-1.5">
+          <span class={`inline-block h-3 w-3 rounded ${catStyle[c].dot}`}></span>{catStyle[c].label}
+        </span>
+      ))}
+    </div>
+
+    <!-- 课表:渲染所有 周×班 组合,JS 切换显示 -->
+    {weeks.map((w) =>
+      ttClasses.map((c) => {
+        const slots = timetable[w.id][c.id];
+        const dates = getDates(w.id);
+        return (
+          <div
+            class="tt-panel"
+            data-week={w.id}
+            data-class={c.id}
+            style={w.id === 'w1' && c.id === 'c1' ? '' : 'display:none'}
+          >
+            <div class="mb-3 flex items-baseline gap-3">
+              <h2 class="font-display text-2xl text-ink">{c.label}</h2>
+              <span class="text-sm font-medium text-ink/50">{w.label} · {w.range}</span>
+            </div>
+            <div class="overflow-x-auto rounded-2xl border border-line bg-card shadow-[0_6px_20px_rgba(120,110,90,0.08)]">
+              <table class="w-full min-w-[760px] border-collapse text-center">
+                <thead>
+                  <tr class="bg-sun-100/60">
+                    <th class="sticky left-0 z-10 bg-sun-100/60 px-3 py-3 text-xs font-bold tracking-wider text-ink/55">时间</th>
+                    {dayNames.map((d, di) => (
+                      <th class="px-2 py-3 text-xs font-bold text-ink/70">
+                        <div>{d}</div>
+                        <div class="mt-0.5 font-normal text-ink/35">{dates[di]}</div>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {slots.map((slot) => (
+                    <tr class="border-t border-line">
+                      <td class="sticky left-0 z-10 whitespace-nowrap bg-card px-3 py-2 text-xs font-bold tabular-nums text-ink/55">
+                        {slot.time}
+                      </td>
+                      {slot.cells.map((name) => {
+                        if (!name) return <td class="px-1.5 py-2"></td>;
+                        const st = catStyle[ttCategory(name)];
+                        return (
+                          <td class="px-1.5 py-2">
+                            <span class={`inline-block w-full rounded-lg px-2 py-1.5 text-xs font-semibold leading-snug ${st.cell}`}>
+                              {name}
+                            </span>
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        );
+      })
+    )}
+
+    <p class="mt-5 text-center text-xs text-ink/40">课表数据整理自营期排课表，最终以现场安排为准。</p>
+  </div>
+</BaseLayout>
+
+<script>
+  // 两个索引联动:切换 班级 / 周次 时显示对应课表面板
+  const setup = () => {
+    const classBtns = document.querySelectorAll<HTMLButtonElement>('.tt-class');
+    const weekBtns = document.querySelectorAll<HTMLButtonElement>('.tt-week');
+    const panels = document.querySelectorAll<HTMLElement>('.tt-panel');
+    if (!panels.length) return;
+
+    let curClass = 'c1';
+    let curWeek = 'w1';
+
+    const sync = () => {
+      panels.forEach((p) => {
+        const on = p.dataset.week === curWeek && p.dataset.class === curClass;
+        p.style.display = on ? '' : 'none';
+      });
+    };
+    const activate = (btns: NodeListOf<HTMLButtonElement>, btn: HTMLButtonElement, onClass: string) => {
+      btns.forEach((b) => {
+        b.classList.remove('active', onClass, 'text-ink');
+        b.classList.add('bg-card', 'text-ink/65');
+      });
+      btn.classList.add('active', onClass, 'text-ink');
+      btn.classList.remove('bg-card', 'text-ink/65');
+    };
+
+    classBtns.forEach((b) =>
+      b.addEventListener('click', () => {
+        curClass = b.dataset.class!;
+        activate(classBtns, b, 'bg-sun-400');
+        sync();
+      })
+    );
+    weekBtns.forEach((b) =>
+      b.addEventListener('click', () => {
+        curWeek = b.dataset.week!;
+        activate(weekBtns, b, 'bg-grass-400');
+        sync();
+      })
+    );
+  };
+  setup();
+  document.addEventListener('astro:page-load', setup);
+</script>
