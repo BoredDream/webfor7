@@ -67,13 +67,22 @@ const sideStats = stats.filter((s) => s !== mainStat);
         </div>
         <p class="mt-5 text-ink/60 font-medium leading-relaxed">每一个数字背后,都是一段真实发生的相遇。</p>
       </div>
-      {sideStats.map((s, i) => (
-        <div class={`sticker-card p-5 text-center ${['rotate-1', '-rotate-1', 'rotate-[1.5deg]'][i % 3]}`}>
-          <p class="font-display text-4xl text-ink"><Counter value={s.value} /></p>
-          <p class="mt-1 text-sm font-bold text-ink/55">{s.suffix}</p>
-          <p class="mt-2 inline-block rounded-full bg-sun-200/70 px-3 py-0.5 text-xs font-bold text-ink">{s.label}</p>
-        </div>
-      ))}
+      {sideStats.map((s, i) =>
+        s.href ? (
+          <a href={s.href} class={`sticker-card group p-5 text-center ${['rotate-1', '-rotate-1', 'rotate-[1.5deg]'][i % 3]}`}>
+            <p class="font-display text-4xl text-ink"><Counter value={s.value} /></p>
+            <p class="mt-1 text-sm font-bold text-ink/55">{s.suffix}</p>
+            <p class="mt-2 inline-block rounded-full bg-sun-200/70 px-3 py-0.5 text-xs font-bold text-ink">{s.label}</p>
+            <span class="mt-2 block text-xs font-bold text-ink/35 group-hover:translate-x-0.5 transition-transform">查看课表 →</span>
+          </a>
+        ) : (
+          <div class={`sticker-card p-5 text-center ${['rotate-1', '-rotate-1', 'rotate-[1.5deg]'][i % 3]}`}>
+            <p class="font-display text-4xl text-ink"><Counter value={s.value} /></p>
+            <p class="mt-1 text-sm font-bold text-ink/55">{s.suffix}</p>
+            <p class="mt-2 inline-block rounded-full bg-sun-200/70 px-3 py-0.5 text-xs font-bold text-ink">{s.label}</p>
+          </div>
+        )
+      )}
       <a href="/team" class="sticker-card group p-5 bg-sun-400 -rotate-[1.5deg] flex flex-col items-center justify-center text-center">
         <Doodle variant="sparkle" class="w-8 mb-2" />
         <p class="font-display text-lg text-ink leading-snug">认识把光带过去的人</p>

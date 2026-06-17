@@ -14,15 +14,61 @@ const tints = ['bg-csky-100', 'bg-camber-100', 'bg-cpink-100', 'bg-cgrass-100', 
 const tint = tints[member.id.charCodeAt(0) % tints.length];
 ---
 
-<a href={href} class={`sticker-card group block p-6 text-center h-full ${cls}`}>
-  <div class={`sticker-chip mx-auto mb-4 w-20 h-20 rounded-full ${tint} grid place-items-center overflow-hidden -rotate-2`}>
-    {isImage ? (
-      <img src={member.avatar} alt={member.name} class="w-full h-full object-cover" />
-    ) : (
-      <span class="text-4xl transition-transform duration-300 group-hover:scale-110">{member.avatar}</span>
-    )}
+<a href={href} class={`team-flip-card group block h-72 text-center ${cls}`} aria-label={`查看${member.name}的个人介绍`}>
+  <div class="team-flip-inner relative h-full">
+    <div class="team-flip-face team-flip-front sticker-card flex h-full flex-col items-center justify-center p-7">
+      <div class={`sticker-chip mx-auto mb-5 grid h-20 w-20 place-items-center overflow-hidden rounded-full ${tint} -rotate-2`}>
+        {isImage ? (
+          <img src={member.avatar} alt={member.name} class="h-full w-full object-cover" />
+        ) : (
+          <span class="text-4xl transition-transform duration-300 group-hover:scale-110">{member.avatar}</span>
+        )}
+      </div>
+      <h3 class="font-display text-2xl font-bold text-ink">{member.name}</h3>
+      <p class="mt-2 text-base font-extrabold text-camber-700">{member.role}</p>
+      <span class="absolute bottom-5 right-6 text-xs font-bold text-ink/35">翻转 -></span>
+    </div>
+
+    <div class="team-flip-face team-flip-back sticker-card flex h-full flex-col justify-center p-7 text-left">
+      <p class="text-xs font-extrabold tracking-widest text-camber-700">个人简介</p>
+      <h3 class="mt-2 font-display text-2xl font-bold text-ink">{member.name}</h3>
+      <p class="mt-4 text-sm font-semibold leading-7 text-ink/70">{member.bio}</p>
+      {member.intro?.[0] && <p class="mt-3 line-clamp-3 text-sm font-medium leading-7 text-ink/60">{member.intro[0]}</p>}
+      <span class="mt-5 text-xs font-bold text-ink/40">点击查看详情</span>
+    </div>
   </div>
-  <h3 class="font-display text-xl text-ink">{member.name}</h3>
-  <p class="text-sm font-bold text-ink/50 mt-0.5">{member.role}</p>
-  {member.bio && <p class="text-sm font-medium text-ink/60 mt-2 leading-relaxed">{member.bio}</p>}
 </a>
+
+<style>
+  .team-flip-card {
+    perspective: 1100px;
+  }
+
+  .team-flip-inner {
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .team-flip-card:hover .team-flip-inner,
+  .team-flip-card:focus-visible .team-flip-inner {
+    transform: rotateY(180deg);
+  }
+
+  .team-flip-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  .team-flip-back {
+    transform: rotateY(180deg);
+    background: #fffdf6;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .team-flip-inner {
+      transition: none;
+    }
+  }
+</style>

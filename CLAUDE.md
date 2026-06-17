@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 项目概况
 
-萤火支教项目展示网站 —— 基于 Astro 5 的纯静态站点。界面文案、注释与内容均为中文(zh-CN)。项目没有测试和 lint 配置,改动后用 `npm run build` 或开发服务器验证。
+暖阳项目展示网站 —— 基于 Astro 5 的纯静态站点。界面文案、注释与内容均为中文(zh-CN)。项目没有测试和 lint 配置,改动后用 `npm run build` 或开发服务器验证。
 
 ## 常用命令
 

@@ -53,7 +53,7 @@ const siblings = classesByGroup(cls.ageGroupId).filter((c) => c.id !== cls.id);
     </header>
 
     <!-- 带班老师 -->
-    <section class="mb-12">
+    <section id="timetable" class="mb-12 scroll-mt-24">
       <SectionTitle title="带班老师" emoji="🧑‍🏫" hl="grass" />
       {head ? (
         <a href={`/team/${head.id}`} class="sticker-card group mt-6 inline-flex items-center gap-5 p-6 -rotate-[0.4deg]">

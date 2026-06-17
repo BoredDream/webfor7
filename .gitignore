@@ -14,3 +14,4 @@ npm-debug.log*
 Thumbs.db
 
 host.txt
+.npm-cache/
