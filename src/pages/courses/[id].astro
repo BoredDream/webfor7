@@ -66,7 +66,7 @@ const related = courses.filter((c) => c.category === course.category && c.id !==
         <div class="space-y-3">
           {course.coursewareUrl ? (
             <a href={course.coursewareUrl} download class="sticker-btn bg-sun-400 !px-4 !py-2 text-sm">
-              📥 下载课件
+              📥 下载课件{course.coursewareName ? `：${course.coursewareName}` : ''}
             </a>
           ) : (
             <p class="text-sm font-medium text-ink/40">课件整理中…</p>

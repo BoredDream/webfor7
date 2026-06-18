@@ -12,10 +12,11 @@ export type Course = {
   category: '科学' | '人文' | '艺术' | '素养';
   teacherId: string; // 任课/代课老师,关联 members.id
   coursewareUrl?: string; // 课件下载链接(放 public/files/ 下)
+  coursewareName?: string; // 下载时显示的课件文件名
   videoUrl?: string; // 相关趣味科普视频链接
 };
 
-export const courses: Course[] = [
+const courseList: Course[] = [
   {
     id: 'shici',
     title: '诗词鉴赏',
@@ -24,7 +25,6 @@ export const courses: Course[] = [
     goal: '在诵读与品析中感受古诗词之美,厚植文化底蕴。',
     category: '人文',
     teacherId: 'su',
-    coursewareUrl: '/files/课件示例.txt',
     highlights: ['经典诗词诵读', '诗中有画·配画', '飞花令小竞赛'],
     intro: [
       '从耳熟能详的唐诗宋词入手,带孩子读出节奏、读懂意境。',
@@ -39,7 +39,8 @@ export const courses: Course[] = [
     goal: '用游戏和歌曲打开英语的大门,敢说敢用。',
     category: '人文',
     teacherId: 'su',
-    coursewareUrl: '/files/课件示例.txt',
+    coursewareUrl: '/files/fun-english.zip',
+    coursewareName: '趣味英语.zip',
     highlights: ['字母与自然拼读', '英文儿歌律动', '情景对话游戏'],
     intro: [
       '不背单词表,而是从英文儿歌、动画和小游戏出发,让孩子先爱上、再开口。',
@@ -54,7 +55,6 @@ export const courses: Course[] = [
     goal: '用图形化编程培养逻辑思维与创造力。',
     category: '科学',
     teacherId: 'chen',
-    coursewareUrl: '/files/课件示例.txt',
     videoUrl: 'https://www.bilibili.com',
     highlights: ['图形化积木编程', '小游戏动画制作', '逻辑闯关挑战'],
     intro: [
@@ -70,7 +70,8 @@ export const courses: Course[] = [
     goal: '揭开人工智能的神秘面纱,看见科技与未来。',
     category: '科学',
     teacherId: 'chen',
-    coursewareUrl: '/files/课件示例.txt',
+    coursewareUrl: '/files/ai-knowledge.zip',
+    coursewareName: 'AI知识科普.zip',
     videoUrl: 'https://www.bilibili.com',
     highlights: ['AI 就在身边', '人脸/语音识别体验', '聊聊机器人'],
     intro: [
@@ -86,7 +87,6 @@ export const courses: Course[] = [
     goal: '在数字与密码游戏中感受数学之美与思维乐趣。',
     category: '科学',
     teacherId: 'chen',
-    coursewareUrl: '/files/课件示例.txt',
     highlights: ['有趣的数字规律', '凯撒密码解谜', '动手做密信'],
     intro: [
       '从生活中的数字规律出发,带孩子认识密码背后的数学思想。',
@@ -101,7 +101,8 @@ export const courses: Course[] = [
     goal: '跳出课本,在游戏与故事中重新认识数学。',
     category: '科学',
     teacherId: 'chen',
-    coursewareUrl: '/files/课件示例.txt',
+    coursewareUrl: '/files/math-culture.zip',
+    coursewareName: '数学文化活动.zip',
     highlights: ['数学小故事', '七巧板与图形', '趣味数独闯关'],
     intro: [
       '数学不只是计算。通过数学家的小故事、七巧板和趣味谜题,让孩子看见数学好玩的一面。',
@@ -116,7 +117,8 @@ export const courses: Course[] = [
     goal: '用画笔和双手表达想象,感受创作的快乐。',
     category: '艺术',
     teacherId: 'zhe',
-    coursewareUrl: '/files/课件示例.txt',
+    coursewareUrl: '/files/art-craft.zip',
+    coursewareName: '绘画手工.zip',
     highlights: ['主题创意画', '废旧材料手工', '班级共创作品'],
     intro: [
       '美术课鼓励"没有画错的画",用彩笔、黏土和废旧材料自由创作。',
@@ -131,7 +133,8 @@ export const courses: Course[] = [
     goal: '讲好红色故事,把安全知识记在心里。',
     category: '素养',
     teacherId: 'wang',
-    coursewareUrl: '/files/课件示例.txt',
+    coursewareUrl: '/files/red-safety.zip',
+    coursewareName: '红色安全教育.zip',
     highlights: ['红色小故事', '防溺水·用电安全', '安全情景演练'],
     intro: [
       '通过生动的红色故事,在孩子心中种下家国情怀。',
@@ -146,7 +149,6 @@ export const courses: Course[] = [
     goal: '在成长与陪伴中,认识自己、热爱家乡与祖国。',
     category: '素养',
     teacherId: 'lin',
-    coursewareUrl: '/files/课件示例.txt',
     highlights: ['我和我的家乡', '成长心理小课', '梦想宣言'],
     intro: [
       '把爱国教育和孩子的成长结合起来,从认识家乡、认识自己开始。',
@@ -168,5 +170,22 @@ export const courses: Course[] = [
     ],
   },
 ];
+
+const courseOrder = [
+  'math',
+  'ai',
+  'english',
+  'art',
+  'redsafety',
+  'coding',
+  'shici',
+  'crypto',
+  'patriot',
+  'tutoring',
+];
+
+export const courses: Course[] = [...courseList].sort(
+  (a, b) => courseOrder.indexOf(a.id) - courseOrder.indexOf(b.id),
+);
 
 export const getCourse = (id: string) => courses.find((c) => c.id === id);

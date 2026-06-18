@@ -15,7 +15,7 @@ export const stats: { label: string; value: string; suffix?: string; href?: stri
   { label: '覆盖年级', value: '2', suffix: '个年级' },
   { label: '受益学生', value: '80', suffix: '名' },
   { label: '课时', value: '80', suffix: '节', href: '/timetable' },
-  { label: '志愿者', value: '14', suffix: '名' },
+  { label: '志愿者', value: '15', suffix: '名' },
 ];
 
 // 顶部导航 —— 报道为首页
